@@ -1,0 +1,15 @@
+{
+  "name": "jp.illusive-isc.rurune-optimizer",
+  "version": "0.9.0",
+  "displayName": "RuruneOptimizer",
+  "description": "RuruneOptimizer",
+  "unity": "2022.3",
+  "author": {
+    "name": "illusive_isc",
+    "url": "https://illusive_isc.jp"
+  },
+  "url": "https://github.com/illusive-isc/AAOBlocker",
+  "dependencies": {
+    "nadena.dev.ndmf": "https://vpm.nadena.dev/vpm.json"
+  }
+}

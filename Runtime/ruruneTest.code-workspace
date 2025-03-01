@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../../../ruruneTest"
+		},
+		{
+			"name": "RuruneOptimizer",
+			"path": "../../.."
+		}
+	],
+	"settings": {
+		"dotnet.defaultSolution": "ruruneTest.sln"
+	}
+}
