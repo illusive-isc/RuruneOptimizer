@@ -1,5 +1,5 @@
 # RuruneOptimizer
-## ↓VPMでの保存は下記画像クリック
+## ↓VPMでの登録リンクは下記画像クリック
 [![image](https://github.com/user-attachments/assets/9aac42ee-af91-417f-afef-e9635ade4bdd)](https://illusive-isc.github.io/vpm-repos/)
 
 
