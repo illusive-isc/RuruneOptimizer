@@ -1,4 +1,8 @@
 # RuruneOptimizer
+
+## 内容について
+まだ開発途中ですが、最低限の動作はしてくれます
+
 ## ↓VPMでの登録リンクは下記クリック
 https://illusive-isc.github.io/vpm-repos/
 
