@@ -162,6 +162,47 @@ namespace jp.illusive_isc.RuruneOptimizer
                 // レイヤーを追加
                 filteredLayers.Add(newLayer);
             }
+            else
+            {
+                if (def != null && def.stateMachine.states.Length >= 1)
+                {
+                    // 新しい StateMachine を作成
+                    AnimatorStateMachine newStateMachine = new AnimatorStateMachine();
+                    newStateMachine.name = "MainCtrlTree_SM";
+
+                    // ステートを2つだけコピー
+                    var states = def.stateMachine.states.Take(2).ToArray();
+                    AnimatorState state1 = newStateMachine.AddState(
+                        states[0].state.name,
+                        states[0].position
+                    );
+
+                    // MotionがBlendTreeなら新しいインスタンスを作成
+                    state1.motion = CopyMotion(states[0].state.motion);
+
+                    // スピードのコピー
+                    state1.speed = states[0].state.speed;
+
+                    // デフォルトステートの設定
+                    newStateMachine.defaultState = state1;
+
+                    // 新しいレイヤーを作成
+                    AnimatorControllerLayer newLayer = new AnimatorControllerLayer
+                    {
+                        name = "MainCtrlTree",
+                        avatarMask = def.avatarMask,
+                        blendingMode = def.blendingMode,
+                        defaultWeight = def.defaultWeight,
+                        iKPass = def.iKPass,
+                        syncedLayerIndex = def.syncedLayerIndex,
+                        syncedLayerAffectsTiming = def.syncedLayerAffectsTiming,
+                        stateMachine = newStateMachine,
+                    };
+
+                    // レイヤーを追加
+                    filteredLayers.Add(newLayer);
+                }
+            }
 
             // レイヤーを適用
             newController.layers = filteredLayers.ToArray();
