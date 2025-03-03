@@ -56,36 +56,27 @@ namespace jp.illusive_isc.RuruneOptimizer
             serializedObject.Update();
 
             // 各フィールドをカスタムラベル付きで表示
-            EditorGUILayout.PropertyField(petFlgProp, new GUIContent("ペット削除フラグ"));
-            EditorGUILayout.PropertyField(ClothFlgProp, new GUIContent("衣装削除フラグ"));
-            EditorGUILayout.PropertyField(HairFlgProp, new GUIContent("髪毛削除フラグ"));
-            EditorGUILayout.PropertyField(TPSFlgProp, new GUIContent("TPS削除フラグ"));
-            EditorGUILayout.PropertyField(ClairvoyanceFlgProp, new GUIContent("透視削除フラグ"));
+            EditorGUILayout.PropertyField(petFlgProp, new GUIContent("ペット削除"));
+            EditorGUILayout.PropertyField(ClothFlgProp, new GUIContent("衣装削除"));
+            EditorGUILayout.PropertyField(HairFlgProp, new GUIContent("髪毛削除"));
+            EditorGUILayout.PropertyField(TPSFlgProp, new GUIContent("TPS削除"));
+            EditorGUILayout.PropertyField(ClairvoyanceFlgProp, new GUIContent("透視削除"));
             EditorGUILayout.PropertyField(
                 colliderJumpFlgProp,
-                new GUIContent("コライダー・ジャンプ削除フラグ")
+                new GUIContent("コライダー・ジャンプ削除")
             );
-            EditorGUILayout.PropertyField(pictureFlgProp, new GUIContent("撮影ギミック削除フラグ"));
-            EditorGUILayout.PropertyField(
-                BreastSizeFlgProp,
-                new GUIContent("バストサイズ削除フラグ")
-            );
-            EditorGUILayout.PropertyField(LightGunFlgProp, new GUIContent("ライトガン削除フラグ"));
-            EditorGUILayout.PropertyField(
-                WhiteBreathFlgProp,
-                new GUIContent("ホワイトブレス削除フラグ")
-            );
-            EditorGUILayout.PropertyField(
-                BubbleBreathFlgProp,
-                new GUIContent("バブルブレス削除フラグ")
-            );
+            EditorGUILayout.PropertyField(pictureFlgProp, new GUIContent("撮影ギミック削除"));
+            EditorGUILayout.PropertyField(BreastSizeFlgProp, new GUIContent("バストサイズ削除"));
+            EditorGUILayout.PropertyField(LightGunFlgProp, new GUIContent("ライトガン削除"));
+            EditorGUILayout.PropertyField(WhiteBreathFlgProp, new GUIContent("ホワイトブレス削除"));
+            EditorGUILayout.PropertyField(BubbleBreathFlgProp, new GUIContent("バブルブレス削除"));
             EditorGUILayout.PropertyField(
                 WaterStampFlgProp,
-                new GUIContent("ウォータースタンプ削除フラグ")
+                new GUIContent("ウォータースタンプ削除")
             );
-            EditorGUILayout.PropertyField(eightBitFlgProp, new GUIContent("8bit削除フラグ"));
-            EditorGUILayout.PropertyField(PenCtrlFlgProp, new GUIContent("ペン操作削除フラグ"));
-            EditorGUILayout.PropertyField(HeartGunFlgProp, new GUIContent("ハートガン削除フラグ"));
+            EditorGUILayout.PropertyField(eightBitFlgProp, new GUIContent("8bit削除"));
+            EditorGUILayout.PropertyField(PenCtrlFlgProp, new GUIContent("ペン操作削除"));
+            EditorGUILayout.PropertyField(HeartGunFlgProp, new GUIContent("ハートガン削除"));
 
             // Execute ボタンの追加
             if (GUILayout.Button("Execute"))

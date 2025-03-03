@@ -12,53 +12,53 @@ namespace jp.illusive_isc.RuruneOptimizer
     public class IllRuruneOptimizer : IllRuruneOptimizerBase
     {
         // 新しい AnimatorController を作成
-        string pathDir = "Assets/I/rurune/Clon/FX";
+        string pathDir = "Assets/IKUSIA/rurune/Clon/FX/";
         string pathName = "paryi_FX.controller";
 
         [SerializeField]
-        private bool petFlg = true;
+        private bool petFlg = false;
 
         [SerializeField]
-        private bool ClothFlg = true;
+        private bool ClothFlg = false;
 
         [SerializeField]
-        private bool HairFlg = true;
+        private bool HairFlg = false;
 
         [SerializeField]
-        private bool TPSFlg = true;
+        private bool TPSFlg = false;
 
         [SerializeField]
-        private bool ClairvoyanceFlg = true;
+        private bool ClairvoyanceFlg = false;
 
         [SerializeField]
-        private bool colliderJumpFlg = true;
+        private bool colliderJumpFlg = false;
 
         [SerializeField]
-        private bool pictureFlg = true;
+        private bool pictureFlg = false;
 
         [SerializeField]
-        private bool BreastSizeFlg = true;
+        private bool BreastSizeFlg = false;
 
         [SerializeField]
-        private bool LightGunFlg = true;
+        private bool LightGunFlg = false;
 
         [SerializeField]
-        private bool WhiteBreathFlg = true;
+        private bool WhiteBreathFlg = false;
 
         [SerializeField]
-        private bool BubbleBreathFlg = true;
+        private bool BubbleBreathFlg = false;
 
         [SerializeField]
-        private bool WaterStampFlg = true;
+        private bool WaterStampFlg = false;
 
         [SerializeField]
-        private bool eightBitFlg = true;
+        private bool eightBitFlg = false;
 
         [SerializeField]
-        private bool PenCtrlFlg = true;
+        private bool PenCtrlFlg = false;
 
         [SerializeField]
-        private bool HeartGunFlg = true;
+        private bool HeartGunFlg = false;
 
         [SerializeField]
         private AnimatorController controller;
