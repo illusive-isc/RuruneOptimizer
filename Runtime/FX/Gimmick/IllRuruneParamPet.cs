@@ -8,7 +8,8 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    public class IllRuruneParamPet : IllRuruneParam
+    [AddComponentMenu("")]
+    internal class IllRuruneParamPet : IllRuruneParam
     {
         HashSet<string> paramList = new();
         VRCAvatarDescriptor descriptor;
@@ -180,10 +181,10 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamPet DestroyObj()
         {
-            DestroySafety(descriptor.transform.Find("Advanced/Pet model"));
-            DestroySafety(descriptor.transform.Find("Advanced/Pet_Player_Position"));
-            DestroySafety(descriptor.transform.Find("Advanced/Pet_follow"));
-            DestroySafety(descriptor.transform.Find("Advanced/PlayerDistance_Pet"));
+            DestroyObj(descriptor.transform.Find("Advanced/Pet model"));
+            DestroyObj(descriptor.transform.Find("Advanced/Pet_Player_Position"));
+            DestroyObj(descriptor.transform.Find("Advanced/Pet_follow"));
+            DestroyObj(descriptor.transform.Find("Advanced/PlayerDistance_Pet"));
             return this;
         }
     }

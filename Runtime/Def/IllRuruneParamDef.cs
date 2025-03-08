@@ -8,7 +8,8 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    public class IllRuruneParamDef : IllRuruneParam
+    [AddComponentMenu("")]
+    internal class IllRuruneParamDef : IllRuruneParam
     {
         HashSet<string> paramList = new();
         VRCAvatarDescriptor descriptor;
@@ -221,11 +222,11 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamDef DestroyObj()
         {
-            DestroySafety(descriptor.transform.Find("Advanced/Object"));
-            DestroySafety(descriptor.transform.Find("Advanced/FaceEffect"));
-            DestroySafety(descriptor.transform.Find("Advanced/Particle/6"));
-            DestroySafety(descriptor.transform.Find("Advanced/Gimmick1/8"));
-            DestroySafety(descriptor.transform.Find("Advanced/Constraint"));
+            DestroyObj(descriptor.transform.Find("Advanced/Object"));
+            DestroyObj(descriptor.transform.Find("Advanced/FaceEffect"));
+            DestroyObj(descriptor.transform.Find("Advanced/Particle/6"));
+            DestroyObj(descriptor.transform.Find("Advanced/Gimmick1/8"));
+            DestroyObj(descriptor.transform.Find("Advanced/Constraint"));
 
             return this;
         }

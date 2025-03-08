@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 #if UNITY_EDITOR
@@ -7,7 +8,8 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    public class IllRuruneParamPenCtrl : IllRuruneParam
+    [AddComponentMenu("")]
+    internal class IllRuruneParamPenCtrl : IllRuruneParam
     {
         HashSet<string> paramList = new();
         VRCAvatarDescriptor descriptor;
@@ -30,62 +32,43 @@ namespace jp.illusive_isc.RuruneOptimizer
             this.animator = animator;
         }
 
-        public IllRuruneParamPenCtrl DeleteFx()
+        public IllRuruneParamPenCtrl DeleteFx(bool HeartGunFlg)
         {
-            var removedLayers = animator
-                .layers.Where(layer => Layers.Contains(layer.name))
-                .ToList();
-
-            animator.layers = animator
-                .layers.Where(layer => !Layers.Contains(layer.name))
-                .ToArray();
-
-            foreach (var layer in removedLayers)
+            if (!HeartGunFlg)
             {
-                foreach (var state in layer.stateMachine.states)
+                foreach (
+                    var layer in animator.layers.Where(layer =>
+                        layer.name is "PenCtrl_R" or "PenCtrl_L"
+                    )
+                )
                 {
-                    AddIfNotInParameters(
-                        paramList,
-                        exsistParams,
-                        state.state.cycleOffsetParameter,
-                        state.state.cycleOffsetParameterActive
-                    );
-                    AddIfNotInParameters(
-                        paramList,
-                        exsistParams,
-                        state.state.timeParameter,
-                        state.state.timeParameterActive
-                    );
-                    AddIfNotInParameters(
-                        paramList,
-                        exsistParams,
-                        state.state.speedParameter,
-                        state.state.speedParameterActive
-                    );
-                    AddIfNotInParameters(
-                        paramList,
-                        exsistParams,
-                        state.state.mirrorParameter,
-                        state.state.mirrorParameterActive
-                    );
+                    layer.stateMachine.states = layer
+                        .stateMachine.states.Where(state =>
+                            !(
+                                state.state.name
+                                is "particlePen1draw R"
+                                    or "particlePen1draw off R"
+                                    or "particlePenGrabCtrl1 R"
+                                    or "PenEraserR"
+                                    or "particlePen1draw L"
+                                    or "particlePen1draw off L"
+                                    or "particlePenGrabCtrl1 L"
+                                    or "PenEraserL"
+                            )
+                        )
+                        .ToArray();
+                    var states = layer.stateMachine.states;
 
-                    foreach (var transition in state.state.transitions)
-                    {
-                        foreach (var condition in transition.conditions)
-                        {
-                            AddIfNotInParameters(paramList, exsistParams, condition.parameter);
-                        }
-                    }
-                }
-
-                foreach (var transition in layer.stateMachine.anyStateTransitions)
-                {
-                    foreach (var condition in transition.conditions)
-                    {
-                        AddIfNotInParameters(paramList, exsistParams, condition.parameter);
-                    }
+                    layer.stateMachine.states = states;
                 }
             }
+            else
+            {
+                animator.layers = animator
+                    .layers.Where(layer => !Layers.Contains(layer.name))
+                    .ToArray();
+            }
+
             return this;
         }
 
@@ -158,7 +141,7 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamPenCtrl DestroyObj()
         {
-            DestroySafety(descriptor.transform.Find("Advanced/Particle/7"));
+            DestroyObj(descriptor.transform.Find("Advanced/Particle/7"));
             return this;
         }
     }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 #if UNITY_EDITOR
@@ -7,7 +8,8 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    public class IllRuruneParamBubbleBreath : IllRuruneParam
+    [AddComponentMenu("")]
+    internal class IllRuruneParamBubbleBreath : IllRuruneParam
     {
         VRCAvatarDescriptor descriptor;
         AnimatorController animator;
@@ -41,6 +43,7 @@ namespace jp.illusive_isc.RuruneOptimizer
                     {
                         blendTree.children = blendTree
                             .children.Where(c => CheckBT(c.motion, MenuParameters))
+                            .Where(c => !(c.motion.name == "Voice_bubbles"))
                             .ToArray();
                     }
                 }
@@ -80,7 +83,7 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamBubbleBreath DestroyObj()
         {
-            DestroySafety(descriptor.transform.Find("Advanced/Particle/3"));
+            DestroyObj(descriptor.transform.Find("Advanced/Particle/3"));
             return this;
         }
     }

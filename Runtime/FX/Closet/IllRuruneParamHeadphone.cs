@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 #if UNITY_EDITOR
@@ -8,29 +8,19 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    [AddComponentMenu("")]
-    internal class IllRuruneParamTPS : IllRuruneParam
+    internal class IllRuruneParamHeadphone : IllRuruneParam
     {
         VRCAvatarDescriptor descriptor;
         AnimatorController animator;
+        private static readonly List<string> MenuParameters = new() { "Object4", "Particle4" };
 
-        private static readonly List<string> MenuParameters = new() { "TPS" };
-
-        public IllRuruneParamTPS(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamHeadphone(VRCAvatarDescriptor descriptor, AnimatorController animator)
         {
             this.descriptor = descriptor;
             this.animator = animator;
         }
 
-        public IllRuruneParamTPS DeleteParam()
-        {
-            animator.parameters = animator
-                .parameters.Where(parameter => !MenuParameters.Contains(parameter.name))
-                .ToArray();
-            return this;
-        }
-
-        public IllRuruneParamTPS DeleteFxBT()
+        public IllRuruneParamHeadphone DeleteFxBT()
         {
             foreach (var layer in animator.layers.Where(layer => layer.name == "MainCtrlTree"))
             {
@@ -47,7 +37,15 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamTPS DeleteVRCExpressions(
+        public IllRuruneParamHeadphone DeleteParam()
+        {
+            animator.parameters = animator
+                .parameters.Where(parameter => !MenuParameters.Contains(parameter.name))
+                .ToArray();
+            return this;
+        }
+
+        public IllRuruneParamHeadphone DeleteVRCExpressions(
             VRCExpressionsMenu menu,
             VRCExpressionParameters param
         )
@@ -56,30 +54,35 @@ namespace jp.illusive_isc.RuruneOptimizer
                 .parameters.Where(parameter => !MenuParameters.Contains(parameter.name))
                 .ToArray();
 
-            foreach (var control in menu.controls)
+            foreach (var control1 in menu.controls)
             {
-                if (control.name == "Gimmick")
+                if (control1.name == "Particle")
                 {
-                    var expressionsSubMenu = control.subMenu;
+                    var expressionsSubMenu1 = control1.subMenu;
 
-                    foreach (var control2 in expressionsSubMenu.controls)
+                    foreach (var control2 in expressionsSubMenu1.controls)
                     {
-                        if (control2.name == "TPS")
+                        if (control2.name == "headphone")
                         {
-                            expressionsSubMenu.controls.Remove(control2);
+                            expressionsSubMenu1.controls.Remove(control2);
                             break;
                         }
                     }
-                    control.subMenu = expressionsSubMenu;
+                    control1.subMenu = expressionsSubMenu1;
                     break;
                 }
             }
             return this;
         }
 
-        public IllRuruneParamTPS DestroyObj()
+        public IllRuruneParamHeadphone DestroyObj()
         {
-            DestroyObj(descriptor.transform.Find("Advanced/TPS"));
+            DestroyObj(
+                descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/headphone_particle")
+            );
+
+            DestroyObj(descriptor.transform.Find("Advanced/Particle/4"));
+
             return this;
         }
     }

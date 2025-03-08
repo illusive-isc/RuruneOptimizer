@@ -5,12 +5,17 @@ using VRC.SDK3.Avatars.Components; // VRCAvatarDescriptor を使用するため
 namespace jp.illusive_isc.RuruneOptimizer
 {
     [CustomEditor(typeof(IllRuruneOptimizer))]
-    public class IllRuruneOptimizerEditor : Editor
+    [AddComponentMenu("")]
+    internal class IllRuruneOptimizerEditor : Editor
     {
         // 各シリアライズプロパティを保持する変数
         SerializedProperty petFlgProp;
         SerializedProperty ClothFlgProp;
         SerializedProperty HairFlgProp;
+        SerializedProperty TailFlgProp;
+        SerializedProperty ClothDelFlgProp;
+        SerializedProperty HairDelFlgProp;
+        SerializedProperty HeadphoneFlgProp;
         SerializedProperty TPSFlgProp;
         SerializedProperty ClairvoyanceFlgProp;
         SerializedProperty colliderJumpFlgProp;
@@ -26,6 +31,9 @@ namespace jp.illusive_isc.RuruneOptimizer
         SerializedProperty controllerProp;
         SerializedProperty menuProp;
         SerializedProperty paramProp;
+        SerializedProperty controllerDefProp;
+        SerializedProperty menuDefProp;
+        SerializedProperty paramDefProp;
 
         private void OnEnable()
         {
@@ -33,6 +41,10 @@ namespace jp.illusive_isc.RuruneOptimizer
             petFlgProp = serializedObject.FindProperty("petFlg");
             ClothFlgProp = serializedObject.FindProperty("ClothFlg");
             HairFlgProp = serializedObject.FindProperty("HairFlg");
+            ClothDelFlgProp = serializedObject.FindProperty("ClothDelFlg");
+            HairDelFlgProp = serializedObject.FindProperty("HairDelFlg");
+            TailFlgProp = serializedObject.FindProperty("TailFlg");
+            HeadphoneFlgProp = serializedObject.FindProperty("HeadphoneFlg");
             TPSFlgProp = serializedObject.FindProperty("TPSFlg");
             ClairvoyanceFlgProp = serializedObject.FindProperty("ClairvoyanceFlg");
             colliderJumpFlgProp = serializedObject.FindProperty("colliderJumpFlg");
@@ -48,6 +60,9 @@ namespace jp.illusive_isc.RuruneOptimizer
             controllerProp = serializedObject.FindProperty("controller");
             menuProp = serializedObject.FindProperty("menu");
             paramProp = serializedObject.FindProperty("param");
+            controllerDefProp = serializedObject.FindProperty("controllerDef");
+            menuDefProp = serializedObject.FindProperty("menuDef");
+            paramDefProp = serializedObject.FindProperty("paramDef");
         }
 
         public override void OnInspectorGUI()
@@ -58,7 +73,31 @@ namespace jp.illusive_isc.RuruneOptimizer
             // 各フィールドをカスタムラベル付きで表示
             EditorGUILayout.PropertyField(petFlgProp, new GUIContent("ペット削除"));
             EditorGUILayout.PropertyField(ClothFlgProp, new GUIContent("衣装削除"));
+            if (!ClothFlgProp.boolValue)
+            {
+                GUI.enabled = false;
+                ClothDelFlgProp.boolValue = false;
+            }
+
+            EditorGUILayout.PropertyField(
+                ClothDelFlgProp,
+                new GUIContent("衣装のメッシュを取り除く")
+            );
+            EditorGUILayout.PropertyField(TailFlgProp, new GUIContent("尻尾メッシュ削除"));
+            GUI.enabled = true;
             EditorGUILayout.PropertyField(HairFlgProp, new GUIContent("髪毛削除"));
+            if (!HairFlgProp.boolValue)
+            {
+                GUI.enabled = false;
+                HairDelFlgProp.boolValue = false;
+            }
+
+            EditorGUILayout.PropertyField(
+                HairDelFlgProp,
+                new GUIContent("髪毛のメッシュを取り除く")
+            );
+            GUI.enabled = true;
+            EditorGUILayout.PropertyField(HeadphoneFlgProp, new GUIContent("ヘッドフォン削除"));
             EditorGUILayout.PropertyField(TPSFlgProp, new GUIContent("TPS削除"));
             EditorGUILayout.PropertyField(ClairvoyanceFlgProp, new GUIContent("透視削除"));
             EditorGUILayout.PropertyField(
@@ -86,7 +125,15 @@ namespace jp.illusive_isc.RuruneOptimizer
                     script.transform.root.GetComponent<VRCAvatarDescriptor>();
                 if (descriptor != null)
                 {
-                    script.Execute(descriptor);
+                    try
+                    {
+                        script.Execute(descriptor);
+                    }
+                    catch (System.Exception)
+                    {
+                        Debug.LogWarning("変換に失敗しました。再実行します。");
+                        script.Execute(descriptor);
+                    }
                 }
                 else
                 {
@@ -94,7 +141,22 @@ namespace jp.illusive_isc.RuruneOptimizer
                 }
             }
             EditorGUILayout.Space();
-            // ヘッダー部分：太字、24pt、白文字のテキストを表示
+            GUILayout.TextField(
+                "生成する元Asset",
+                new GUIStyle
+                {
+                    fontStyle = FontStyle.Bold,
+                    fontSize = 24,
+                    normal = new GUIStyleState { textColor = Color.white },
+                }
+            );
+            GUI.enabled = false;
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(controllerDefProp, new GUIContent("Animator Controller"));
+            EditorGUILayout.PropertyField(menuDefProp, new GUIContent("Expressions Menu"));
+            EditorGUILayout.PropertyField(paramDefProp, new GUIContent("Expression Parameters"));
+            GUI.enabled = true;
+            EditorGUILayout.Space();
             GUILayout.TextField(
                 "生成されたAsset",
                 new GUIStyle

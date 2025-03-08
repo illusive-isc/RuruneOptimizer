@@ -8,7 +8,8 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    public class IllRuruneParamLightGun : IllRuruneParam
+    [AddComponentMenu("")]
+    internal class IllRuruneParamLightGun : IllRuruneParam
     {
         HashSet<string> paramList = new();
         VRCAvatarDescriptor descriptor;
@@ -154,7 +155,7 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamLightGun DestroyObj()
         {
-            DestroySafety(descriptor.transform.Find("Advanced/butterfly"));
+            DestroyObj(descriptor.transform.Find("Advanced/butterfly"));
             return this;
         }
     }

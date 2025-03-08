@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 #if UNITY_EDITOR
@@ -7,12 +8,19 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    public class IllRuruneParamWaterStamp : IllRuruneParam
+    [AddComponentMenu("")]
+    internal class IllRuruneParamWaterStamp : IllRuruneParam
     {
         VRCAvatarDescriptor descriptor;
         AnimatorController animator;
 
-        private static readonly List<string> MenuParameters = new() { "Particle2" };
+        private static readonly List<string> MenuParameters = new()
+        {
+            "Particle2",
+            "WaterFoot_R",
+            "WaterFoot_L",
+            "Grounded",
+        };
 
         public IllRuruneParamWaterStamp(VRCAvatarDescriptor descriptor, AnimatorController animator)
         {
@@ -77,7 +85,7 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamWaterStamp DestroyObj()
         {
-            DestroySafety(descriptor.transform.Find("Advanced/Particle/2"));
+            DestroyObj(descriptor.transform.Find("Advanced/Particle/2"));
             return this;
         }
     }

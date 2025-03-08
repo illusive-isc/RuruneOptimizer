@@ -8,7 +8,7 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    public class IllRuruneParamHair : IllRuruneParam
+    internal class IllRuruneParamHair : IllRuruneParam
     {
         VRCAvatarDescriptor descriptor;
         AnimatorController animator;
@@ -17,7 +17,6 @@ namespace jp.illusive_isc.RuruneOptimizer
             "Object1",
             "Object2",
             "Object3",
-            "Object4",
             "Object5",
             "Object6",
             "Object7",
@@ -81,51 +80,50 @@ namespace jp.illusive_isc.RuruneOptimizer
                     control1.subMenu = expressionsSubMenu1;
                     break;
                 }
-                if (control1.name == "Particle")
-                {
-                    var expressionsSubMenu1 = control1.subMenu;
-
-                    foreach (var control2 in expressionsSubMenu1.controls)
-                    {
-                        if (control2.name == "headphone")
-                        {
-                            expressionsSubMenu1.controls.Remove(control2);
-                            break;
-                        }
-                    }
-                    control1.subMenu = expressionsSubMenu1;
-                    break;
-                }
             }
+            return this;
+        }
+
+        public IllRuruneParamHair EditorOnly()
+        {
+            EditorOnly(descriptor.transform.Find("hair"));
+            EditorOnly(descriptor.transform.Find("hair_2"));
+            EditorOnly(descriptor.transform.Find("Armature/plane_collider"));
+            EditorOnly(descriptor.transform.Find("Advanced/Hair_Ground"));
+            EditorOnly(descriptor.transform.Find("Advanced/Hair_Contact"));
+            EditorOnly(descriptor.transform.Find("hair"));
+
+            EditorOnly(descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/Hair_root"));
+
             return this;
         }
 
         public IllRuruneParamHair DestroyObj()
         {
-            DestroySafety(descriptor.transform.Find("hair"));
-            DestroySafety(descriptor.transform.Find("hair_2"));
-            DestroySafety(descriptor.transform.Find("Armature/plane_collider"));
-            DestroySafety(descriptor.transform.Find("Advanced/Hair_Ground"));
-            DestroySafety(descriptor.transform.Find("Advanced/Hair_Contact"));
-            DestroySafety(descriptor.transform.Find("hair"));
-            DestroySafety(
-                descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/headphone_particle")
-            );
+            DestroyObj(descriptor.transform.Find("hair"));
+            DestroyObj(descriptor.transform.Find("hair_2"));
+            DestroyObj(descriptor.transform.Find("Armature/plane_collider"));
+            DestroyObj(descriptor.transform.Find("Advanced/Hair_Ground"));
+            DestroyObj(descriptor.transform.Find("Advanced/Hair_Contact"));
+            DestroyObj(descriptor.transform.Find("hair"));
 
-            DestroySafety(descriptor.transform.Find("Advanced/Particle/4"));
-            DestroySafety(
-                descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/rurune_headphone")
-            );
-            DestroySafety(
-                descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/Hair_root")
-            );
+            DestroyObj(descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/Hair_root"));
             foreach (
                 var physBoneCollider in descriptor
                     .transform.Find("Armature")
                     .GetComponentsInChildren<VRCPhysBoneColliderBase>()
             )
             {
-                if (physBoneCollider.gameObject.name != "plane_tail_collider")
+                if (
+                    !(
+                        physBoneCollider.gameObject.name
+                        is "plane_tail_collider"
+                            or "Breast_L"
+                            or "Breast_R"
+                    )
+                )
+                    DestroyImmediate(physBoneCollider.gameObject);
+                else if (physBoneCollider.gameObject.name is "Breast_L" or "Breast_R")
                     DestroyImmediate(physBoneCollider);
             }
 

@@ -5,7 +5,8 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    public class IllRuruneParam : MonoBehaviour
+    [AddComponentMenu("")]
+    internal class IllRuruneParam : ScriptableObject
     {
         protected static List<string> exsistParams = new() { "TRUE", "paryi_AFK" };
         protected static readonly List<string> VRCParameters = new()
@@ -49,19 +50,43 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
         }
 
-        public static void DestroySafety(Transform obj)
+        public static void EditorOnly(Transform obj)
         {
             if (obj)
             {
-                DestroySafety(obj.gameObject);
+                EditorOnly(obj.gameObject);
             }
         }
 
-        public static void DestroySafety(GameObject obj)
+        public static void EditorOnly(GameObject obj)
         {
             if (obj)
             {
                 obj.tag = "EditorOnly";
+            }
+        }
+
+        public static void DestroyObj(Transform obj)
+        {
+            if (obj)
+            {
+                DestroyObj(obj.gameObject);
+            }
+        }
+
+        public static void DestroyObj(GameObject obj)
+        {
+            if (obj)
+            {
+                DestroyImmediate(obj);
+            }
+        }
+
+        public void ExeDestroyObj(Transform obj)
+        {
+            if (obj)
+            {
+                DestroyObj(obj);
             }
         }
 

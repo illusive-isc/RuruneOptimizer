@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 #if UNITY_EDITOR
@@ -7,7 +8,8 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    public class IllRuruneParam8bit : IllRuruneParam
+    [AddComponentMenu("")]
+    internal class IllRuruneParam8bit : IllRuruneParam
     {
         VRCAvatarDescriptor descriptor;
         AnimatorController animator;
@@ -77,7 +79,7 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParam8bit DestroyObj()
         {
-            DestroySafety(descriptor.transform.Find("Advanced/Particle/5"));
+            DestroyObj(descriptor.transform.Find("Advanced/Particle/5"));
             return this;
         }
     }

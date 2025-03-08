@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 #if UNITY_EDITOR
@@ -7,7 +8,8 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    public class IllRuruneParamHeartGun : IllRuruneParam
+    [AddComponentMenu("")]
+    internal class IllRuruneParamHeartGun : IllRuruneParam
     {
         HashSet<string> paramList = new();
         VRCAvatarDescriptor descriptor;
@@ -19,6 +21,7 @@ namespace jp.illusive_isc.RuruneOptimizer
         {
             "HeartGun",
             "HeartGunCollider R",
+            "HeartGunCollider L",
         };
 
         public IllRuruneParamHeartGun(VRCAvatarDescriptor descriptor, AnimatorController animator)
@@ -29,60 +32,34 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamHeartGun DeleteFx()
         {
-            var removedLayers = animator
-                .layers.Where(layer => Layers.Contains(layer.name))
-                .ToList();
+            foreach (
+                var layer in animator.layers.Where(layer =>
+                    layer.name is "PenCtrl_R" or "PenCtrl_L"
+                )
+            )
+            {
+                layer.stateMachine.states = layer
+                    .stateMachine.states.Where(state =>
+                        !(
+                            state.state.name
+                            is "on"
+                                or "Head"
+                                or "shot"
+                                or "Head 0"
+                                or "shot 0"
+                                or "shot 0 0"
+                        )
+                    )
+                    .ToArray();
+                var states = layer.stateMachine.states;
+
+                layer.stateMachine.states = states;
+            }
 
             animator.layers = animator
                 .layers.Where(layer => !Layers.Contains(layer.name))
                 .ToArray();
 
-            foreach (var layer in removedLayers)
-            {
-                foreach (var state in layer.stateMachine.states)
-                {
-                    AddIfNotInParameters(
-                        paramList,
-                        exsistParams,
-                        state.state.cycleOffsetParameter,
-                        state.state.cycleOffsetParameterActive
-                    );
-                    AddIfNotInParameters(
-                        paramList,
-                        exsistParams,
-                        state.state.timeParameter,
-                        state.state.timeParameterActive
-                    );
-                    AddIfNotInParameters(
-                        paramList,
-                        exsistParams,
-                        state.state.speedParameter,
-                        state.state.speedParameterActive
-                    );
-                    AddIfNotInParameters(
-                        paramList,
-                        exsistParams,
-                        state.state.mirrorParameter,
-                        state.state.mirrorParameterActive
-                    );
-
-                    foreach (var transition in state.state.transitions)
-                    {
-                        foreach (var condition in transition.conditions)
-                        {
-                            AddIfNotInParameters(paramList, exsistParams, condition.parameter);
-                        }
-                    }
-                }
-
-                foreach (var transition in layer.stateMachine.anyStateTransitions)
-                {
-                    foreach (var condition in transition.conditions)
-                    {
-                        AddIfNotInParameters(paramList, exsistParams, condition.parameter);
-                    }
-                }
-            }
             return this;
         }
 
@@ -150,10 +127,10 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamHeartGun DestroyObj()
         {
-            DestroySafety(descriptor.transform.Find("Advanced/HeartGunR"));
-            DestroySafety(descriptor.transform.Find("Advanced/HeartGunL"));
-            DestroySafety(descriptor.transform.Find("Advanced/HeartGunR2"));
-            DestroySafety(descriptor.transform.Find("Advanced/HeartGunL2"));
+            DestroyObj(descriptor.transform.Find("Advanced/HeartGunR"));
+            DestroyObj(descriptor.transform.Find("Advanced/HeartGunL"));
+            DestroyObj(descriptor.transform.Find("Advanced/HeartGunR2"));
+            DestroyObj(descriptor.transform.Find("Advanced/HeartGunL2"));
             return this;
         }
     }

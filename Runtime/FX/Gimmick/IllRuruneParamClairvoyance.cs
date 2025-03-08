@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 #if UNITY_EDITOR
@@ -7,7 +8,8 @@ using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
-    public class IllRuruneParamClairvoyance : IllRuruneParam
+    [AddComponentMenu("")]
+    internal class IllRuruneParamClairvoyance : IllRuruneParam
     {
         VRCAvatarDescriptor descriptor;
         AnimatorController animator;
@@ -80,7 +82,7 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamClairvoyance DestroyObj()
         {
-            DestroySafety(descriptor.transform.Find("Advanced/clairvoyance"));
+            DestroyObj(descriptor.transform.Find("Advanced/clairvoyance"));
             return this;
         }
     }
