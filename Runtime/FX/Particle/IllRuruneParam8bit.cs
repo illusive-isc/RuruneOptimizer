@@ -16,10 +16,14 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         private static readonly List<string> MenuParameters = new() { "Particle5" };
 
-        public IllRuruneParam8bit(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParam8bit Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParam8bit DeleteParam()

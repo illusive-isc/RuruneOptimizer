@@ -26,10 +26,14 @@ namespace jp.illusive_isc.RuruneOptimizer
             "butterfly_stand",
         };
 
-        public IllRuruneParamLightGun(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamLightGun Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamLightGun DeleteFx()

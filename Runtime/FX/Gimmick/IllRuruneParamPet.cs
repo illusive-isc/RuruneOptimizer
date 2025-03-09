@@ -52,10 +52,14 @@ namespace jp.illusive_isc.RuruneOptimizer
             "Pet_Head_Position",
         };
 
-        public IllRuruneParamPet(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamPet Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamPet DeleteFx()

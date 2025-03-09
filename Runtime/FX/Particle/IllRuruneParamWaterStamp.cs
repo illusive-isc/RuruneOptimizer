@@ -22,10 +22,14 @@ namespace jp.illusive_isc.RuruneOptimizer
             "Grounded",
         };
 
-        public IllRuruneParamWaterStamp(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamWaterStamp Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamWaterStamp DeleteParam()

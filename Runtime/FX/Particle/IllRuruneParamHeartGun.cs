@@ -21,13 +21,16 @@ namespace jp.illusive_isc.RuruneOptimizer
         {
             "HeartGun",
             "HeartGunCollider R",
-            "HeartGunCollider L",
         };
 
-        public IllRuruneParamHeartGun(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamHeartGun Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamHeartGun DeleteFx()

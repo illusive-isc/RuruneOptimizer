@@ -21,10 +21,14 @@ namespace jp.illusive_isc.RuruneOptimizer
             "Camera_eye_hide",
         };
 
-        public IllRuruneParamPicture(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamPicture Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamPicture DeleteParam()

@@ -25,10 +25,14 @@ namespace jp.illusive_isc.RuruneOptimizer
             "AllOff",
         };
 
-        public IllRuruneParamCloth(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamCloth Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamCloth DeleteFxBT()
@@ -86,44 +90,16 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamCloth EditorOnlyAll(bool TailFlg)
-        {
-            DestroyObj(descriptor.transform.Find("acce"));
-            DestroyObj(descriptor.transform.Find("boots"));
-            DestroyObj(descriptor.transform.Find("cloth"));
-            DestroyObj(descriptor.transform.Find("gloves"));
-            DestroyObj(descriptor.transform.Find("jacket"));
-            DestroyObj(descriptor.transform.Find("knee-socks"));
-            EditorOnly(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_back")
-            );
-            DestroyObj(descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L"));
-            EditorOnly(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L.007")
-            );
-            EditorOnly(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L.012")
-            );
-            EditorOnly(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L.017")
-            );
-            DestroyObj(descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R"));
-            EditorOnly(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R.007")
-            );
-            EditorOnly(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R.012")
-            );
-            EditorOnly(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R.017")
-            );
-            if (TailFlg)
-                DestroyObj(descriptor.transform.Find("Armature/Hips/Skirt_Root"));
-            return this;
-        }
-
         public IllRuruneParamCloth DestroyObjAll(bool TailFlg)
         {
+            descriptor
+                .transform.Find("underwear")
+                .GetComponent<SkinnedMeshRenderer>()
+                .SetBlendShapeWeight(3, 0);
+            descriptor
+                .transform.Find("underwear")
+                .GetComponent<SkinnedMeshRenderer>()
+                .SetBlendShapeWeight(4, 0);
             DestroyObj(descriptor.transform.Find("acce"));
             DestroyObj(descriptor.transform.Find("boots"));
             DestroyObj(descriptor.transform.Find("cloth"));

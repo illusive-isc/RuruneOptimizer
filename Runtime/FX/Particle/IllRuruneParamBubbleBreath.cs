@@ -16,13 +16,14 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         private static readonly List<string> MenuParameters = new() { "Particle3" };
 
-        public IllRuruneParamBubbleBreath(
+        public IllRuruneParamBubbleBreath Initialize(
             VRCAvatarDescriptor descriptor,
             AnimatorController animator
         )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamBubbleBreath DeleteParam()

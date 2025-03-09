@@ -26,19 +26,10 @@ namespace jp.illusive_isc.RuruneOptimizer
         private bool ClothFlg = false;
 
         [SerializeField]
-        private bool ClothDelFlg = false;
-
-        [SerializeField]
         private bool HairFlg = false;
 
         [SerializeField]
-        private bool HairDelFlg = false;
-
-        [SerializeField]
         private bool TailFlg = false;
-
-        [SerializeField]
-        private bool HeadphoneFlg = false;
 
         [SerializeField]
         private bool TPSFlg = false;
@@ -77,6 +68,9 @@ namespace jp.illusive_isc.RuruneOptimizer
         private bool HeartGunFlg = false;
 
         [SerializeField]
+        private bool FaceFlg = false;
+
+        [SerializeField]
         private AnimatorController controllerDef;
 
         [SerializeField]
@@ -100,6 +94,8 @@ namespace jp.illusive_isc.RuruneOptimizer
             if (!string.IsNullOrEmpty(pathDir + pathName))
             {
                 AssetDatabase.DeleteAsset(pathDir + pathName);
+                AssetDatabase.DeleteAsset(pathDir + "Menu");
+                AssetDatabase.DeleteAsset(pathDir + "paryi_paraments.asset");
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             }
@@ -145,8 +141,10 @@ namespace jp.illusive_isc.RuruneOptimizer
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            IllRuruneParamDef illRuruneParamDef = new(descriptor, controller);
+            IllRuruneParamDef illRuruneParamDef =
+                ScriptableObject.CreateInstance<IllRuruneParamDef>();
             illRuruneParamDef
+                .Initialize(descriptor, controller)
                 .DeleteFx()
                 .DeleteFxBT()
                 .DeleteParam()
@@ -155,8 +153,10 @@ namespace jp.illusive_isc.RuruneOptimizer
 
             if (petFlg)
             {
-                IllRuruneParamPet illRuruneParamPet = new(descriptor, controller);
+                IllRuruneParamPet illRuruneParamPet =
+                    ScriptableObject.CreateInstance<IllRuruneParamPet>();
                 illRuruneParamPet
+                    .Initialize(descriptor, controller)
                     .DeleteFx()
                     .DeleteFxBT()
                     .DeleteParam()
@@ -165,45 +165,43 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             if (TailFlg)
             {
-                IllRuruneParamTail illRuruneParamTail = new(descriptor, controller);
-                illRuruneParamTail.DeleteFxBT().DeleteParam().DestroyObj();
+                IllRuruneParamTail illRuruneParamTail =
+                    ScriptableObject.CreateInstance<IllRuruneParamTail>();
+                illRuruneParamTail
+                    .Initialize(descriptor, controller)
+                    .DeleteFxBT()
+                    .DeleteParam()
+                    .DestroyObj();
             }
             if (ClothFlg)
             {
-                IllRuruneParamCloth illRuruneParamCloth = new(descriptor, controller);
+                IllRuruneParamCloth illRuruneParamCloth =
+                    ScriptableObject.CreateInstance<IllRuruneParamCloth>();
                 illRuruneParamCloth
+                    .Initialize(descriptor, controller)
                     .DeleteFxBT()
                     .DeleteParam()
                     .DeleteVRCExpressions(menu, param)
-                    .EditorOnlyAll(TailFlg);
-                if (ClothDelFlg)
-                    illRuruneParamCloth.DestroyObjAll(TailFlg);
+                    .DestroyObjAll(TailFlg);
             }
             if (HairFlg)
             {
-                IllRuruneParamHair illRuruneParamHair = new(descriptor, controller);
+                IllRuruneParamHair illRuruneParamHair =
+                    ScriptableObject.CreateInstance<IllRuruneParamHair>();
                 illRuruneParamHair
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .EditorOnly();
-                if (HairDelFlg)
-                    illRuruneParamHair.DestroyObj();
-            }
-
-            if (HeadphoneFlg)
-            {
-                IllRuruneParamHeadphone illRuruneParamHeadphone = new(descriptor, controller);
-                illRuruneParamHeadphone
+                    .Initialize(descriptor, controller)
                     .DeleteFxBT()
                     .DeleteParam()
                     .DeleteVRCExpressions(menu, param)
                     .DestroyObj();
             }
+
             if (TPSFlg)
             {
-                IllRuruneParamTPS illRuruneParamTPS = new(descriptor, controller);
+                IllRuruneParamTPS illRuruneParamTPS =
+                    ScriptableObject.CreateInstance<IllRuruneParamTPS>();
                 illRuruneParamTPS
+                    .Initialize(descriptor, controller)
                     .DeleteFxBT()
                     .DeleteParam()
                     .DeleteVRCExpressions(menu, param)
@@ -211,8 +209,10 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             if (ClairvoyanceFlg)
             {
-                IllRuruneParamClairvoyance illRuruneParamClairvoyance = new(descriptor, controller);
+                IllRuruneParamClairvoyance illRuruneParamClairvoyance =
+                    ScriptableObject.CreateInstance<IllRuruneParamClairvoyance>();
                 illRuruneParamClairvoyance
+                    .Initialize(descriptor, controller)
                     .DeleteFxBT()
                     .DeleteParam()
                     .DeleteVRCExpressions(menu, param)
@@ -220,8 +220,10 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             if (colliderJumpFlg)
             {
-                IllRuruneParamCollider illRuruneParamCollider = new(descriptor, controller);
+                IllRuruneParamCollider illRuruneParamCollider =
+                    ScriptableObject.CreateInstance<IllRuruneParamCollider>();
                 illRuruneParamCollider
+                    .Initialize(descriptor, controller)
                     .DeleteFx()
                     .DeleteFxBT()
                     .DeleteParam()
@@ -230,8 +232,10 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             if (pictureFlg)
             {
-                IllRuruneParamPicture illRuruneParamPicture = new(descriptor, controller);
+                IllRuruneParamPicture illRuruneParamPicture =
+                    ScriptableObject.CreateInstance<IllRuruneParamPicture>();
                 illRuruneParamPicture
+                    .Initialize(descriptor, controller)
                     .DeleteFxBT()
                     .DeleteParam()
                     .DeleteVRCExpressions(menu, param)
@@ -239,16 +243,20 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             if (BreastSizeFlg)
             {
-                IllRuruneParamBreastSize illRuruneParamBreastSize = new(descriptor, controller);
+                IllRuruneParamBreastSize illRuruneParamBreastSize =
+                    ScriptableObject.CreateInstance<IllRuruneParamBreastSize>();
                 illRuruneParamBreastSize
+                    .Initialize(descriptor, controller)
                     .DeleteFxBT()
                     .DeleteParam()
                     .DeleteVRCExpressions(menu, param);
             }
             if (LightGunFlg)
             {
-                IllRuruneParamLightGun illRuruneParamLightGun = new(descriptor, controller);
+                IllRuruneParamLightGun illRuruneParamLightGun =
+                    ScriptableObject.CreateInstance<IllRuruneParamLightGun>();
                 illRuruneParamLightGun
+                    .Initialize(descriptor, controller)
                     .DeleteFx()
                     .DeleteFxBT()
                     .DeleteParam()
@@ -257,8 +265,10 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             if (WhiteBreathFlg)
             {
-                IllRuruneParamWhiteBreath illRuruneParamWhiteBreath = new(descriptor, controller);
+                IllRuruneParamWhiteBreath illRuruneParamWhiteBreath =
+                    ScriptableObject.CreateInstance<IllRuruneParamWhiteBreath>();
                 illRuruneParamWhiteBreath
+                    .Initialize(descriptor, controller)
                     .DeleteFxBT()
                     .DeleteParam()
                     .DeleteVRCExpressions(menu, param)
@@ -266,8 +276,10 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             if (BubbleBreathFlg)
             {
-                IllRuruneParamBubbleBreath illRuruneParamBubbleBreath = new(descriptor, controller);
+                IllRuruneParamBubbleBreath illRuruneParamBubbleBreath =
+                    ScriptableObject.CreateInstance<IllRuruneParamBubbleBreath>();
                 illRuruneParamBubbleBreath
+                    .Initialize(descriptor, controller)
                     .DeleteFxBT()
                     .DeleteParam()
                     .DeleteVRCExpressions(menu, param)
@@ -275,8 +287,10 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             if (WaterStampFlg)
             {
-                IllRuruneParamWaterStamp illRuruneParamWaterStamp = new(descriptor, controller);
+                IllRuruneParamWaterStamp illRuruneParamWaterStamp =
+                    ScriptableObject.CreateInstance<IllRuruneParamWaterStamp>();
                 illRuruneParamWaterStamp
+                    .Initialize(descriptor, controller)
                     .DeleteFxBT()
                     .DeleteParam()
                     .DeleteVRCExpressions(menu, param)
@@ -285,8 +299,10 @@ namespace jp.illusive_isc.RuruneOptimizer
 
             if (eightBitFlg)
             {
-                IllRuruneParam8bit illRuruneParam8bit = new(descriptor, controller);
+                IllRuruneParam8bit illRuruneParam8bit =
+                    ScriptableObject.CreateInstance<IllRuruneParam8bit>();
                 illRuruneParam8bit
+                    .Initialize(descriptor, controller)
                     .DeleteFxBT()
                     .DeleteParam()
                     .DeleteVRCExpressions(menu, param)
@@ -294,8 +310,10 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             if (HeartGunFlg)
             {
-                IllRuruneParamHeartGun illRuruneParamHeartGun = new(descriptor, controller);
+                IllRuruneParamHeartGun illRuruneParamHeartGun =
+                    ScriptableObject.CreateInstance<IllRuruneParamHeartGun>();
                 illRuruneParamHeartGun
+                    .Initialize(descriptor, controller)
                     .DeleteFx()
                     .DeleteFxBT()
                     .DeleteParam()
@@ -304,8 +322,10 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             if (PenCtrlFlg)
             {
-                IllRuruneParamPenCtrl illRuruneParamPenCtrl = new(descriptor, controller);
+                IllRuruneParamPenCtrl illRuruneParamPenCtrl =
+                    ScriptableObject.CreateInstance<IllRuruneParamPenCtrl>();
                 illRuruneParamPenCtrl
+                    .Initialize(descriptor, controller)
                     .DeleteFx(HeartGunFlg)
                     .DeleteFxBT()
                     .DeleteParam()
@@ -315,14 +335,13 @@ namespace jp.illusive_isc.RuruneOptimizer
 
             // if (FaceFlg)
             // {
-
+            //     IllRuruneParamFace illRuruneParamFace = new(descriptor, controller);
+            //     illRuruneParamFace
+            //         .DeleteFxBT()
+            //         .DeleteParam()
+            //         .DeleteVRCExpressions(menu, param)
+            //         .DestroyObj();
             // }
-            // IllRuruneParamFace illRuruneParamFace = new(descriptor, controller);
-            // illRuruneParamFace
-            //     .DeleteFxBT()
-            //     .DeleteParam()
-            //     .DeleteVRCExpressions(menu, param)
-            //     .DestroyObj();
             if (ClothFlg && HairFlg)
             {
                 foreach (var control1 in menu.controls)
@@ -357,6 +376,8 @@ namespace jp.illusive_isc.RuruneOptimizer
             descriptor.baseAnimationLayers[4].animatorController = controller;
             descriptor.expressionsMenu = menu;
             descriptor.expressionParameters = param;
+            EditorUtility.SetDirty(descriptor);
+            AssetDatabase.SaveAssets();
             Debug.Log("最適化を実行しました！");
         }
 

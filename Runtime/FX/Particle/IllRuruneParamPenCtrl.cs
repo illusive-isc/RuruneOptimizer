@@ -26,10 +26,14 @@ namespace jp.illusive_isc.RuruneOptimizer
             "Pen2Grab",
         };
 
-        public IllRuruneParamPenCtrl(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamPenCtrl Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamPenCtrl DeleteFx(bool HeartGunFlg)

@@ -29,16 +29,21 @@ namespace jp.illusive_isc.RuruneOptimizer
             "butterfly_Gesture_Set",
             "cameraLight&eyeLookHide",
             "AvatarScale",
+            "Mirror Toggle",
             "koukando",
             "Look_Y",
             "Look_X",
             "blink",
         };
 
-        public IllRuruneParamDef(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamDef Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamDef DeleteFx()
@@ -226,7 +231,12 @@ namespace jp.illusive_isc.RuruneOptimizer
             DestroyObj(descriptor.transform.Find("Advanced/FaceEffect"));
             DestroyObj(descriptor.transform.Find("Advanced/Particle/6"));
             DestroyObj(descriptor.transform.Find("Advanced/Gimmick1/8"));
+            DestroyObj(descriptor.transform.Find("Advanced/Gimmick2/3"));
+            DestroyObj(descriptor.transform.Find("Advanced/Gimmick2/5"));
+            DestroyObj(descriptor.transform.Find("Advanced/Gimmick2/6"));
+            DestroyObj(descriptor.transform.Find("Advanced/Gimmick2/7"));
             DestroyObj(descriptor.transform.Find("Advanced/Constraint"));
+            DestroyObj(descriptor.transform.Find("Advanced/cameraLight&eyeLookHide"));
 
             return this;
         }

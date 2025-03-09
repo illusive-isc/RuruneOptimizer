@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
-using VRC.SDK3.Avatars.ScriptableObjects;
 #if UNITY_EDITOR
 using UnityEditor.Animations;
 
@@ -14,10 +12,14 @@ namespace jp.illusive_isc.RuruneOptimizer
         AnimatorController animator;
         private static readonly List<string> MenuParameters = new() { "Hair_Ground" };
 
-        public IllRuruneParamTail(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamTail Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamTail DeleteFxBT()

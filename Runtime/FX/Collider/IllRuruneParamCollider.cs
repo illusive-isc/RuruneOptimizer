@@ -24,10 +24,14 @@ namespace jp.illusive_isc.RuruneOptimizer
             "JumpCollider",
         };
 
-        public IllRuruneParamCollider(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamCollider Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamCollider DeleteFx()
@@ -143,8 +147,7 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamCollider DestroyObj()
         {
-            DestroyObj(descriptor.transform.Find("Advanced/Gimmick1/JUMP"));
-            DestroyObj(descriptor.transform.Find("Advanced/Gimmick1/SPEED"));
+            DestroyObj(descriptor.transform.Find("Advanced/Gimmick1"));
             return this;
         }
     }

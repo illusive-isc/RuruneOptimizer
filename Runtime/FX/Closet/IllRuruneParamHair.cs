@@ -21,12 +21,18 @@ namespace jp.illusive_isc.RuruneOptimizer
             "Object6",
             "Object7",
             "Hair_Ground",
+            "Object4",
+            "Particle4",
         };
 
-        public IllRuruneParamHair(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamHair Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamHair DeleteFxBT()
@@ -62,7 +68,24 @@ namespace jp.illusive_isc.RuruneOptimizer
             param.parameters = param
                 .parameters.Where(parameter => !MenuParameters.Contains(parameter.name))
                 .ToArray();
+            foreach (var control1 in menu.controls)
+            {
+                if (control1.name == "Particle")
+                {
+                    var expressionsSubMenu1 = control1.subMenu;
 
+                    foreach (var control2 in expressionsSubMenu1.controls)
+                    {
+                        if (control2.name == "headphone")
+                        {
+                            expressionsSubMenu1.controls.Remove(control2);
+                            break;
+                        }
+                    }
+                    control1.subMenu = expressionsSubMenu1;
+                    break;
+                }
+            }
             foreach (var control1 in menu.controls)
             {
                 if (control1.name == "closet")
@@ -106,7 +129,14 @@ namespace jp.illusive_isc.RuruneOptimizer
             DestroyObj(descriptor.transform.Find("Advanced/Hair_Ground"));
             DestroyObj(descriptor.transform.Find("Advanced/Hair_Contact"));
             DestroyObj(descriptor.transform.Find("hair"));
+            DestroyObj(
+                descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/headphone_particle")
+            );
+            DestroyObj(
+                descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/rurune_headphone")
+            );
 
+            DestroyObj(descriptor.transform.Find("Advanced/Particle/4"));
             DestroyObj(descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/Hair_root"));
             foreach (
                 var physBoneCollider in descriptor

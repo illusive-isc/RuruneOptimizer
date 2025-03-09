@@ -16,10 +16,14 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         private static readonly List<string> MenuParameters = new() { "BreastSize" };
 
-        public IllRuruneParamBreastSize(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamBreastSize Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamBreastSize DeleteParam()

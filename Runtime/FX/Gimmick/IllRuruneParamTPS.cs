@@ -16,10 +16,14 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         private static readonly List<string> MenuParameters = new() { "TPS" };
 
-        public IllRuruneParamTPS(VRCAvatarDescriptor descriptor, AnimatorController animator)
+        public IllRuruneParamTPS Initialize(
+            VRCAvatarDescriptor descriptor,
+            AnimatorController animator
+        )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            return this;
         }
 
         public IllRuruneParamTPS DeleteParam()
