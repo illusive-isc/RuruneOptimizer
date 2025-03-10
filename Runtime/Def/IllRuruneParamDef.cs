@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
@@ -48,63 +49,142 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamDef DeleteFx()
         {
-            foreach (var layer in animator.layers.Where(layer => layer.name == "MainCtrlTree"))
+            foreach (var layer in animator.layers)
             {
-                foreach (var state in layer.stateMachine.states)
+                if (layer.name == "MainCtrlTree")
                 {
-                    if (state.state.motion is BlendTree blendTree)
+                    foreach (var state in layer.stateMachine.states)
                     {
-                        BlendTree newBlendTree = new();
-                        newBlendTree.name = "LipSynk";
-                        newBlendTree.blendParameter = "Viseme";
-                        newBlendTree.blendParameterY = "Blend";
-                        newBlendTree.blendType = BlendTreeType.Simple1D;
-                        newBlendTree.useAutomaticThresholds = false;
-                        newBlendTree.maxThreshold = 0.01f;
-                        newBlendTree.minThreshold = 0.0f;
-                        blendTree.AddChild(newBlendTree);
-                        // BlendTreeの子モーションを取得
-                        var children = blendTree.children;
-
-                        // "LipSynk" のモーションがある場合、threshold を変更
-                        for (int i = 0; i < children.Length; i++)
+                        if (state.state.name == "MainCtrlTree 0")
                         {
-                            if (children[i].motion.name == "LipSynk")
-                            {
-                                children[i].threshold = 1;
-                            }
+                            layer.stateMachine.RemoveState(state.state);
+                            break;
                         }
-
-                        // 修正した children 配列を再代入（これをしないと変更が反映されない）
-                        blendTree.children = children;
-
-                        var LipSynk = animator.layers.FirstOrDefault(layer =>
-                            layer.name == "LipSynk"
-                        );
-                        newBlendTree.children = new ChildMotion[]
-                        {
-                            new()
-                            {
-                                motion = LipSynk.stateMachine.defaultState.motion,
-                                threshold = 0.0f,
-                                timeScale = 1,
-                            },
-                            new()
-                            {
-                                motion = LipSynk
-                                    .stateMachine
-                                    .defaultState
-                                    .transitions[0]
-                                    .destinationState
-                                    .motion,
-                                threshold = 0.01f,
-                                timeScale = 1,
-                            },
-                        };
                     }
+                    foreach (var state in layer.stateMachine.states)
+                    {
+                        if (state.state.motion is BlendTree blendTree)
+                        {
+                            BlendTree newBlendTree = new()
+                            {
+                                name = "VRMode",
+                                blendParameter = "VRMode",
+                                blendParameterY = "Blend",
+                                blendType = BlendTreeType.Simple1D,
+                                useAutomaticThresholds = false,
+                                maxThreshold = 1.0f,
+                                minThreshold = 0.0f,
+                            };
+                            blendTree.AddChild(newBlendTree);
+                            // BlendTreeの子モーションを取得
+                            var children = blendTree.children;
+
+                            // "LipSynk" のモーションがある場合、threshold を変更
+                            for (int i = 0; i < children.Length; i++)
+                            {
+                                if (children[i].motion.name == "VRMode")
+                                {
+                                    children[i].threshold = 1;
+                                }
+                            }
+                            // 修正した children 配列を再代入（これをしないと変更が反映されない）
+                            blendTree.children = children;
+
+                            newBlendTree.children = new ChildMotion[]
+                            {
+                                new()
+                                {
+                                    motion = AssetDatabase.LoadAssetAtPath<Motion>(
+                                        AssetDatabase.GUIDToAssetPath(
+                                            AssetDatabase.FindAssets("VRMode0")[0]
+                                        )
+                                    ),
+                                    threshold = 0.0f,
+                                    timeScale = 1,
+                                },
+                                new()
+                                {
+                                    motion = AssetDatabase.LoadAssetAtPath<Motion>(
+                                        AssetDatabase.GUIDToAssetPath(
+                                            AssetDatabase.FindAssets("VRMode1")[0]
+                                        )
+                                    ),
+                                    threshold = 1.0f,
+                                    timeScale = 1,
+                                },
+                            };
+                            AssetDatabase.AddObjectToAsset(newBlendTree, animator);
+                            AssetDatabase.SaveAssets();
+                        }
+                    }
+
+                    foreach (var state in layer.stateMachine.states)
+                    {
+                        if (state.state.motion is BlendTree blendTree)
+                        {
+                            BlendTree newBlendTree = new();
+                            newBlendTree.name = "LipSynk";
+                            newBlendTree.blendParameter = "Viseme";
+                            newBlendTree.blendParameterY = "Blend";
+                            newBlendTree.blendType = BlendTreeType.Simple1D;
+                            newBlendTree.useAutomaticThresholds = false;
+                            newBlendTree.maxThreshold = 0.01f;
+                            newBlendTree.minThreshold = 0.0f;
+                            blendTree.AddChild(newBlendTree);
+                            // BlendTreeの子モーションを取得
+                            var children = blendTree.children;
+
+                            // "LipSynk" のモーションがある場合、threshold を変更
+                            for (int i = 0; i < children.Length; i++)
+                            {
+                                if (children[i].motion.name == "LipSynk")
+                                {
+                                    children[i].threshold = 1;
+                                }
+                            }
+
+                            // 修正した children 配列を再代入（これをしないと変更が反映されない）
+                            blendTree.children = children;
+
+                            var LipSynk = animator.layers.FirstOrDefault(layer =>
+                                layer.name == "LipSynk"
+                            );
+                            newBlendTree.children = new ChildMotion[]
+                            {
+                                new()
+                                {
+                                    motion = LipSynk.stateMachine.defaultState.motion,
+                                    threshold = 0.0f,
+                                    timeScale = 1,
+                                },
+                                new()
+                                {
+                                    motion = LipSynk
+                                        .stateMachine
+                                        .defaultState
+                                        .transitions[0]
+                                        .destinationState
+                                        .motion,
+                                    threshold = 0.01f,
+                                    timeScale = 1,
+                                },
+                            };
+                            AssetDatabase.AddObjectToAsset(newBlendTree, animator);
+                            AssetDatabase.SaveAssets();
+                        }
+                    }
+                    break;
                 }
             }
-
+            // "VRMode" パラメータが Float でない場合は再設定
+            foreach (var p in animator.parameters.Where(p => p.name == "VRMode").ToList())
+            {
+                if (p.type != AnimatorControllerParameterType.Float)
+                {
+                    animator.RemoveParameter(p);
+                    animator.AddParameter("VRMode", AnimatorControllerParameterType.Float);
+                }
+            }
             var removedLayers = animator
                 .layers.Where(layer => Layers.Contains(layer.name))
                 .ToList();
