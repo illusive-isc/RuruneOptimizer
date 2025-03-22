@@ -315,7 +315,8 @@ namespace jp.illusive_isc.RuruneOptimizer
             DestroyObj(descriptor.transform.Find("Advanced/Gimmick2/5"));
             DestroyObj(descriptor.transform.Find("Advanced/Gimmick2/6"));
             DestroyObj(descriptor.transform.Find("Advanced/Gimmick2/7"));
-            DestroyObj(descriptor.transform.Find("Advanced/Constraint"));
+            DestroyObj(descriptor.transform.Find("Advanced/Constraint/Hand_R_Constraint"));
+            DestroyObj(descriptor.transform.Find("Advanced/Constraint/Hand_L_Constraint"));
             DestroyObj(descriptor.transform.Find("Advanced/cameraLight&eyeLookHide"));
 
             return this;
