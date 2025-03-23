@@ -62,7 +62,21 @@ namespace jp.illusive_isc.RuruneOptimizer
                         )
                         .ToArray();
                     var states = layer.stateMachine.states;
-
+                    foreach (var state in states)
+                    {
+                        if (state.state.name == "off")
+                            foreach (var transition in state.state.transitions)
+                            {
+                                if (transition.destinationState.name == "on")
+                                {
+                                    transition.conditions = transition
+                                        .conditions.Where(condition =>
+                                            condition.parameter == "HeartGun"
+                                        )
+                                        .ToArray();
+                                }
+                            }
+                    }
                     layer.stateMachine.states = states;
                 }
             }
