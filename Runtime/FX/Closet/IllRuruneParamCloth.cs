@@ -92,14 +92,12 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamCloth DestroyObjAll(bool TailFlg)
         {
-            descriptor
-                .transform.Find("underwear")
-                .GetComponent<SkinnedMeshRenderer>()
-                .SetBlendShapeWeight(3, 0);
-            descriptor
-                .transform.Find("underwear")
-                .GetComponent<SkinnedMeshRenderer>()
-                .SetBlendShapeWeight(4, 0);
+            var underwear = descriptor.transform.Find("underwear");
+            if (underwear)
+            {
+                underwear.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(3, 0);
+                underwear.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(4, 0);
+            }
             DestroyObj(descriptor.transform.Find("acce"));
             DestroyObj(descriptor.transform.Find("boots"));
             DestroyObj(descriptor.transform.Find("cloth"));
