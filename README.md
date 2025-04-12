@@ -22,5 +22,5 @@ https://illusive-isc.github.io/vpm-repos/
 
 # 操作方法
 ## ↓詳しい操作は下記リンクをクリックした先のYOUTUBEの動画で確認してください
-https://youtu.be/VJ9RXmyRq58
+
 [動画を見る](https://www.youtube.com/watch?v=ieIInpVY0iQ)
