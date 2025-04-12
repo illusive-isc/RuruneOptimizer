@@ -73,6 +73,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             GUILayout.Box(
                 "選択無しで実行するだけで不要な[パラメーター2bit]と[オブジェクト]\n"
                     + "が削除されcheckを入れることで該当項目が、削除されます\n"
+                    + "不要な[networkSyncedパラメーター67bit]の同期checkを外します\n"
                     + "括弧内の数字は削除されるパラメーターの容量になります\n"
                     + "＊＊＊ツールには、元に戻す機能はありません＊＊＊\n",
                 boxStyle,
