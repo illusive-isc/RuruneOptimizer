@@ -23,6 +23,37 @@ namespace jp.illusive_isc.RuruneOptimizer
             "HeartGunCollider L",
             "PlayerCollisionHit",
         };
+        private static readonly List<string> NotSyncParameters = new()
+        {
+            "takasa",
+            "takasa_Toggle",
+            "Action_Mode_Reset",
+            "Action_Mode",
+            "Mirror",
+            "Mirror Toggle",
+            "paryi_change_Standing",
+            "paryi_change_Crouching",
+            "paryi_change_Prone",
+            "paryi_floating",
+            "paryi_change_all_reset",
+            "paryi_change_Mirror_S",
+            "paryi_change_Mirror_P",
+            "paryi_change_Mirror_H",
+            "paryi_change_Mirror_C",
+            "paryi_chang_Loco",
+            "paryi_Jump",
+            "paryi_Jump_cancel",
+            "paryi_change_Standing_M",
+            "paryi_change_Crouching_M",
+            "paryi_change_Prone_M",
+            "paryi_floating_M",
+            "leg fixed",
+            "JumpCollider",
+            "SpeedCollider",
+            "ColliderON",
+            "clairvoyance",
+            "TPS",
+        };
 
         //Pet_Move_Contact
         private static readonly List<string> MenuParameters = new()
@@ -283,6 +314,14 @@ namespace jp.illusive_isc.RuruneOptimizer
                     !paramList.Concat(MenuParameters).Contains(parameter.name)
                 )
                 .ToArray();
+
+            foreach (var parameter in param.parameters)
+            {
+                if (NotSyncParameters.Contains(parameter.name))
+                {
+                    parameter.networkSynced = false;
+                }
+            }
 
             // foreach (var control in menu.controls)
             // {
