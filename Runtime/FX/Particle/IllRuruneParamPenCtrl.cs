@@ -65,6 +65,16 @@ namespace jp.illusive_isc.RuruneOptimizer
                     foreach (var state in states)
                     {
                         if (state.state.name == "off")
+                        {
+                            state.state.transitions = state
+                                .state.transitions.Where(transition =>
+                                    !(
+                                        transition.destinationState.name
+                                        is "particlePen1draw off L"
+                                            or "particlePen1draw off R"
+                                    )
+                                )
+                                .ToArray();
                             foreach (var transition in state.state.transitions)
                             {
                                 if (transition.destinationState.name == "on")
@@ -76,6 +86,11 @@ namespace jp.illusive_isc.RuruneOptimizer
                                         .ToArray();
                                 }
                             }
+                        }
+                        if (state.state.name is "on" or "Head 0" or "Head" or "shot 0")
+                            state.state.transitions = state
+                                .state.transitions.Where(transition => !transition.isExit)
+                                .ToArray();
                     }
                     layer.stateMachine.states = states;
                 }

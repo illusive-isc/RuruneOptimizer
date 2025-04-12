@@ -82,6 +82,17 @@ namespace jp.illusive_isc.RuruneOptimizer
         {
             foreach (var layer in animator.layers)
             {
+                if (layer.name == "butterfly")
+                {
+                    foreach (var state in layer.stateMachine.states)
+                    {
+                        if (state.state.name == "New State" || state.state.name == "New State 0")
+                        {
+                            layer.stateMachine.RemoveState(state.state);
+                            continue;
+                        }
+                    }
+                }
                 if (layer.name == "MainCtrlTree")
                 {
                     foreach (var state in layer.stateMachine.states)
