@@ -1,6 +1,6 @@
 {
   "name": "jp.illusive-isc.rurune-optimizer",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "displayName": "RuruneOptimizer",
   "description": "RuruneOptimizer",
   "unity": "2022.3",
@@ -11,6 +11,6 @@
   "url": "https://github.com/illusive-isc/RuruneOptimizer",
   "vpmDependencies": {
     "nadena.dev.ndmf": "^1.6.0",
-    "com.vrchat.avatars": ">=3.7.0 <3.8.0"
+    "com.vrchat.avatars": ">=3.7.0"
   }
 }
