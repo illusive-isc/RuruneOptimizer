@@ -68,6 +68,27 @@ namespace jp.illusive_isc.RuruneOptimizer
         [SerializeField]
         private bool FaceFlg = false;
 
+        [SerializeField]
+        private bool FaceGestureFlg = false;
+
+        [SerializeField]
+        private bool FaceLockFlg = false;
+
+        [SerializeField]
+        private bool FaceValFlg = false;
+
+        [SerializeField]
+        private bool kamitukiFlg = false;
+
+        [SerializeField]
+        private bool nadeFlg = false;
+
+        [SerializeField]
+        private bool blinkFlg = false;
+
+        [SerializeField]
+        private bool IKUSIA_emote = false;
+
         public AnimatorController controllerDef;
         public VRCExpressionsMenu menuDef;
         public VRCExpressionParameters paramDef;
@@ -129,6 +150,7 @@ namespace jp.illusive_isc.RuruneOptimizer
                 .DeleteFxBT()
                 .DeleteParam()
                 .DeleteVRCExpressions(menu, param)
+                .ParticleOptimize()
                 .DestroyObj();
 
             if (petFlg)
@@ -313,14 +335,61 @@ namespace jp.illusive_isc.RuruneOptimizer
                     .DestroyObj();
             }
 
-            if (FaceFlg)
+            if (FaceGestureFlg || FaceLockFlg || FaceValFlg)
             {
-                IllRuruneParamFace illRuruneParamFace = new(descriptor, controller);
-                illRuruneParamFace
-                    .DeleteFxBT()
+                IllRuruneParamFaceGesture illRuruneParamFaceGesture =
+                    ScriptableObject.CreateInstance<IllRuruneParamFaceGesture>();
+                illRuruneParamFaceGesture
+                    .Initialize(descriptor, controller, FaceGestureFlg, FaceLockFlg, FaceValFlg)
+                    .DeleteFx()
                     .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
+                    .DeleteVRCExpressions(menu, param);
+            }
+            if (kamitukiFlg || nadeFlg || blinkFlg)
+            {
+                IllRuruneParamFaceContact illRuruneParamFaceGesture =
+                    ScriptableObject.CreateInstance<IllRuruneParamFaceContact>();
+                illRuruneParamFaceGesture
+                    .Initialize(descriptor, controller, kamitukiFlg, nadeFlg, blinkFlg)
+                    .DeleteVRCExpressions(menu, param);
+            }
+            if (
+                (FaceGestureFlg || (FaceLockFlg && FaceValFlg))
+                && kamitukiFlg
+                && nadeFlg
+                && blinkFlg
+            )
+            {
+                foreach (var control in menu.controls)
+                {
+                    if (control.name == "Gimmick")
+                    {
+                        var expressionsSubMenu = control.subMenu;
+
+                        foreach (var control2 in expressionsSubMenu.controls)
+                        {
+                            if (control2.name == "Face")
+                            {
+                                expressionsSubMenu.controls.Remove(control2);
+                                break;
+                            }
+                        }
+                        control.subMenu = expressionsSubMenu;
+                        break;
+                    }
+                }
+            }
+            // （必要に応じて各種フラグに合わせた調整処理を実施）
+            if (IKUSIA_emote)
+            {
+                foreach (var control in menu.controls)
+                {
+                    if (control.name == "IKUSIA_emote")
+                    {
+                        menu.controls.Remove(control);
+                        break;
+                    }
+                }
             }
             // （必要に応じて各種フラグに合わせた調整処理を実施）
             if (ClothFlg && HairFlg)

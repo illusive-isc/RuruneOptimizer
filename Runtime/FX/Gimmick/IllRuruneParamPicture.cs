@@ -19,6 +19,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             "LightCamera",
             "LookOBJ",
             "Camera_eye_hide",
+            "eyeLook",
         };
 
         public IllRuruneParamPicture Initialize(

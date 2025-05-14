@@ -24,13 +24,19 @@ namespace jp.illusive_isc.RuruneOptimizer
         SerializedProperty eightBitFlgProp;
         SerializedProperty PenCtrlFlgProp;
         SerializedProperty HeartGunFlgProp;
-        SerializedProperty FaceFlgProp;
+        SerializedProperty FaceGestureFlgProp;
+        SerializedProperty FaceLockFlgProp;
+        SerializedProperty FaceValFlgProp;
+        SerializedProperty kamitukiFlgProp;
+        SerializedProperty nadeFlgProp;
+        SerializedProperty blinkFlgProp;
         SerializedProperty controllerProp;
         SerializedProperty menuProp;
         SerializedProperty paramProp;
         SerializedProperty controllerDefProp;
         SerializedProperty menuDefProp;
         SerializedProperty paramDefProp;
+        SerializedProperty IKUSIA_emoteProp;
 
         private void OnEnable()
         {
@@ -51,13 +57,19 @@ namespace jp.illusive_isc.RuruneOptimizer
             eightBitFlgProp = serializedObject.FindProperty("eightBitFlg");
             PenCtrlFlgProp = serializedObject.FindProperty("PenCtrlFlg");
             HeartGunFlgProp = serializedObject.FindProperty("HeartGunFlg");
-            FaceFlgProp = serializedObject.FindProperty("FaceFlg");
+            FaceGestureFlgProp = serializedObject.FindProperty("FaceGestureFlg");
+            FaceLockFlgProp = serializedObject.FindProperty("FaceLockFlg");
+            FaceValFlgProp = serializedObject.FindProperty("FaceValFlg");
+            kamitukiFlgProp = serializedObject.FindProperty("kamitukiFlg");
+            nadeFlgProp = serializedObject.FindProperty("nadeFlg");
+            blinkFlgProp = serializedObject.FindProperty("blinkFlg");
             controllerProp = serializedObject.FindProperty("controller");
             menuProp = serializedObject.FindProperty("menu");
             paramProp = serializedObject.FindProperty("param");
             controllerDefProp = serializedObject.FindProperty("controllerDef");
             menuDefProp = serializedObject.FindProperty("menuDef");
             paramDefProp = serializedObject.FindProperty("paramDef");
+            IKUSIA_emoteProp = serializedObject.FindProperty("IKUSIA_emote");
         }
 
         public override void OnInspectorGUI()
@@ -129,7 +141,28 @@ namespace jp.illusive_isc.RuruneOptimizer
             EditorGUILayout.PropertyField(eightBitFlgProp, new GUIContent("8bit削除(1Bits)"));
             EditorGUILayout.PropertyField(PenCtrlFlgProp, new GUIContent("ペン操作削除(5Bits)"));
             EditorGUILayout.PropertyField(HeartGunFlgProp, new GUIContent("ハートガン削除(1Bits)"));
-
+            EditorGUILayout.PropertyField(
+                FaceGestureFlgProp,
+                new GUIContent("デフォルトの表情プリセット削除(faceEmoなど使う場合)")
+            );
+            EditorGUILayout.PropertyField(FaceLockFlgProp, new GUIContent("顔lock"));
+            EditorGUILayout.PropertyField(FaceValFlgProp, new GUIContent("顔差分"));
+            EditorGUILayout.PropertyField(
+                blinkFlgProp,
+                new GUIContent("まばたきをメニューから削除して常にON")
+            );
+            EditorGUILayout.PropertyField(
+                nadeFlgProp,
+                new GUIContent("なでギミックをメニューから削除して常にON")
+            );
+            EditorGUILayout.PropertyField(
+                kamitukiFlgProp,
+                new GUIContent("噛みつきをメニューから削除して常にON")
+            );
+            EditorGUILayout.PropertyField(
+                IKUSIA_emoteProp,
+                new GUIContent("IKUSIA_emoteをメニューのみ削除")
+            );
             // Execute ボタンの追加
             if (GUILayout.Button("Execute"))
             {
