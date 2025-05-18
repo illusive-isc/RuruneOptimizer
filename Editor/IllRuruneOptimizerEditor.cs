@@ -145,8 +145,8 @@ namespace jp.illusive_isc.RuruneOptimizer
                 FaceGestureFlgProp,
                 new GUIContent("デフォルトの表情プリセット削除(faceEmoなど使う場合)")
             );
-            EditorGUILayout.PropertyField(FaceLockFlgProp, new GUIContent("顔lock"));
-            EditorGUILayout.PropertyField(FaceValFlgProp, new GUIContent("顔差分"));
+            EditorGUILayout.PropertyField(FaceLockFlgProp, new GUIContent("表情固定機能削除"));
+            EditorGUILayout.PropertyField(FaceValFlgProp, new GUIContent("顔差分変更機能削除"));
             EditorGUILayout.PropertyField(
                 blinkFlgProp,
                 new GUIContent("まばたきをメニューから削除して常にON")
