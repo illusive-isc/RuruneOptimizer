@@ -8,161 +8,282 @@ namespace jp.illusive_isc.RuruneOptimizer
     [AddComponentMenu("")]
     internal class IllRuruneOptimizerEditor : Editor
     {
-        SerializedProperty petFlgProp;
-        SerializedProperty ClothFlgProp;
-        SerializedProperty HairFlgProp;
-        SerializedProperty TailFlgProp;
-        SerializedProperty TPSFlgProp;
-        SerializedProperty ClairvoyanceFlgProp;
-        SerializedProperty colliderJumpFlgProp;
-        SerializedProperty pictureFlgProp;
-        SerializedProperty BreastSizeFlgProp;
-        SerializedProperty LightGunFlgProp;
-        SerializedProperty WhiteBreathFlgProp;
-        SerializedProperty BubbleBreathFlgProp;
-        SerializedProperty WaterStampFlgProp;
-        SerializedProperty eightBitFlgProp;
-        SerializedProperty PenCtrlFlgProp;
-        SerializedProperty HeartGunFlgProp;
-        SerializedProperty FaceGestureFlgProp;
-        SerializedProperty FaceLockFlgProp;
-        SerializedProperty FaceValFlgProp;
-        SerializedProperty kamitukiFlgProp;
-        SerializedProperty nadeFlgProp;
-        SerializedProperty blinkFlgProp;
-        SerializedProperty controllerProp;
-        SerializedProperty menuProp;
-        SerializedProperty paramProp;
-        SerializedProperty controllerDefProp;
-        SerializedProperty menuDefProp;
-        SerializedProperty paramDefProp;
-        SerializedProperty IKUSIA_emoteProp;
+        SerializedProperty petFlg;
+        SerializedProperty ClothFlg;
+        SerializedProperty HairFlg;
+        SerializedProperty TailFlg;
+        SerializedProperty TPSFlg;
+        SerializedProperty ClairvoyanceFlg;
+        SerializedProperty colliderJumpFlg;
+        SerializedProperty pictureFlg;
+        SerializedProperty BreastSizeFlg;
+        SerializedProperty LightGunFlg;
+        SerializedProperty WhiteBreathFlg;
+        SerializedProperty BubbleBreathFlg;
+        SerializedProperty WaterStampFlg;
+        SerializedProperty eightBitFlg;
+        SerializedProperty PenCtrlFlg;
+        SerializedProperty HeartGunFlg;
+        SerializedProperty FaceGestureFlg;
+        SerializedProperty FaceLockFlg;
+        SerializedProperty FaceValFlg;
+        SerializedProperty kamitukiFlg;
+        SerializedProperty nadeFlg;
+        SerializedProperty blinkFlg;
+        SerializedProperty controller;
+        SerializedProperty menu;
+        SerializedProperty param;
+        SerializedProperty controllerDef;
+        SerializedProperty menuDef;
+        SerializedProperty paramDef;
+        SerializedProperty IKUSIA_emote;
+        SerializedProperty heelFlg1;
+        SerializedProperty heelFlg2;
+        SerializedProperty ClothFlg1;
+        SerializedProperty ClothFlg2;
+        SerializedProperty ClothFlg3;
+        SerializedProperty ClothFlg4;
+        SerializedProperty ClothFlg5;
+        SerializedProperty ClothFlg6;
+        SerializedProperty ClothFlg7;
+        SerializedProperty ClothFlg8;
+        SerializedProperty TailFlg1;
+        SerializedProperty BreastSizeFlg1;
+        SerializedProperty BreastSizeFlg2;
+        SerializedProperty BreastSizeFlg3;
+        SerializedProperty IKUSIA_emote1;
+        SerializedProperty HairFlg10;
+        SerializedProperty HairFlg11;
+        SerializedProperty HairFlg12;
+        SerializedProperty HairFlg20;
+        SerializedProperty HairFlg22;
+        SerializedProperty HairFlg30;
+        SerializedProperty HairFlg40;
+        SerializedProperty HairFlg50;
+        SerializedProperty HairFlg51;
+        SerializedProperty HairFlg60;
 
         private void OnEnable()
         {
             // フィールド名は元のクラスの変数名と一致させる
-            petFlgProp = serializedObject.FindProperty("petFlg");
-            ClothFlgProp = serializedObject.FindProperty("ClothFlg");
-            HairFlgProp = serializedObject.FindProperty("HairFlg");
-            TailFlgProp = serializedObject.FindProperty("TailFlg");
-            TPSFlgProp = serializedObject.FindProperty("TPSFlg");
-            ClairvoyanceFlgProp = serializedObject.FindProperty("ClairvoyanceFlg");
-            colliderJumpFlgProp = serializedObject.FindProperty("colliderJumpFlg");
-            pictureFlgProp = serializedObject.FindProperty("pictureFlg");
-            BreastSizeFlgProp = serializedObject.FindProperty("BreastSizeFlg");
-            LightGunFlgProp = serializedObject.FindProperty("LightGunFlg");
-            WhiteBreathFlgProp = serializedObject.FindProperty("WhiteBreathFlg");
-            BubbleBreathFlgProp = serializedObject.FindProperty("BubbleBreathFlg");
-            WaterStampFlgProp = serializedObject.FindProperty("WaterStampFlg");
-            eightBitFlgProp = serializedObject.FindProperty("eightBitFlg");
-            PenCtrlFlgProp = serializedObject.FindProperty("PenCtrlFlg");
-            HeartGunFlgProp = serializedObject.FindProperty("HeartGunFlg");
-            FaceGestureFlgProp = serializedObject.FindProperty("FaceGestureFlg");
-            FaceLockFlgProp = serializedObject.FindProperty("FaceLockFlg");
-            FaceValFlgProp = serializedObject.FindProperty("FaceValFlg");
-            kamitukiFlgProp = serializedObject.FindProperty("kamitukiFlg");
-            nadeFlgProp = serializedObject.FindProperty("nadeFlg");
-            blinkFlgProp = serializedObject.FindProperty("blinkFlg");
-            controllerProp = serializedObject.FindProperty("controller");
-            menuProp = serializedObject.FindProperty("menu");
-            paramProp = serializedObject.FindProperty("param");
-            controllerDefProp = serializedObject.FindProperty("controllerDef");
-            menuDefProp = serializedObject.FindProperty("menuDef");
-            paramDefProp = serializedObject.FindProperty("paramDef");
-            IKUSIA_emoteProp = serializedObject.FindProperty("IKUSIA_emote");
+            petFlg = serializedObject.FindProperty("petFlg");
+            ClothFlg = serializedObject.FindProperty("ClothFlg");
+            HairFlg = serializedObject.FindProperty("HairFlg");
+            TailFlg = serializedObject.FindProperty("TailFlg");
+            TPSFlg = serializedObject.FindProperty("TPSFlg");
+            ClairvoyanceFlg = serializedObject.FindProperty("ClairvoyanceFlg");
+            colliderJumpFlg = serializedObject.FindProperty("colliderJumpFlg");
+            pictureFlg = serializedObject.FindProperty("pictureFlg");
+            BreastSizeFlg = serializedObject.FindProperty("BreastSizeFlg");
+            LightGunFlg = serializedObject.FindProperty("LightGunFlg");
+            WhiteBreathFlg = serializedObject.FindProperty("WhiteBreathFlg");
+            BubbleBreathFlg = serializedObject.FindProperty("BubbleBreathFlg");
+            WaterStampFlg = serializedObject.FindProperty("WaterStampFlg");
+            eightBitFlg = serializedObject.FindProperty("eightBitFlg");
+            PenCtrlFlg = serializedObject.FindProperty("PenCtrlFlg");
+            HeartGunFlg = serializedObject.FindProperty("HeartGunFlg");
+            FaceGestureFlg = serializedObject.FindProperty("FaceGestureFlg");
+            FaceLockFlg = serializedObject.FindProperty("FaceLockFlg");
+            FaceValFlg = serializedObject.FindProperty("FaceValFlg");
+            kamitukiFlg = serializedObject.FindProperty("kamitukiFlg");
+            nadeFlg = serializedObject.FindProperty("nadeFlg");
+            blinkFlg = serializedObject.FindProperty("blinkFlg");
+            controller = serializedObject.FindProperty("controller");
+            menu = serializedObject.FindProperty("menu");
+            param = serializedObject.FindProperty("param");
+            controllerDef = serializedObject.FindProperty("controllerDef");
+            menuDef = serializedObject.FindProperty("menuDef");
+            paramDef = serializedObject.FindProperty("paramDef");
+            IKUSIA_emote = serializedObject.FindProperty("IKUSIA_emote");
+            heelFlg1 = serializedObject.FindProperty("heelFlg1");
+            heelFlg2 = serializedObject.FindProperty("heelFlg2");
+            ClothFlg1 = serializedObject.FindProperty("ClothFlg1");
+            ClothFlg2 = serializedObject.FindProperty("ClothFlg2");
+            ClothFlg3 = serializedObject.FindProperty("ClothFlg3");
+            ClothFlg4 = serializedObject.FindProperty("ClothFlg4");
+            ClothFlg5 = serializedObject.FindProperty("ClothFlg5");
+            ClothFlg6 = serializedObject.FindProperty("ClothFlg6");
+            ClothFlg7 = serializedObject.FindProperty("ClothFlg7");
+            ClothFlg8 = serializedObject.FindProperty("ClothFlg8");
+            TailFlg1 = serializedObject.FindProperty("TailFlg1");
+            BreastSizeFlg1 = serializedObject.FindProperty("BreastSizeFlg1");
+            BreastSizeFlg2 = serializedObject.FindProperty("BreastSizeFlg2");
+            BreastSizeFlg3 = serializedObject.FindProperty("BreastSizeFlg3");
+            IKUSIA_emote1 = serializedObject.FindProperty("IKUSIA_emote1");
+            HairFlg10 = serializedObject.FindProperty("HairFlg1");
+            HairFlg11 = serializedObject.FindProperty("HairFlg11");
+            HairFlg12 = serializedObject.FindProperty("HairFlg12");
+            HairFlg20 = serializedObject.FindProperty("HairFlg2");
+            HairFlg22 = serializedObject.FindProperty("HairFlg22");
+            HairFlg30 = serializedObject.FindProperty("HairFlg3");
+            HairFlg40 = serializedObject.FindProperty("HairFlg4");
+            HairFlg50 = serializedObject.FindProperty("HairFlg5");
+            HairFlg51 = serializedObject.FindProperty("HairFlg51");
+            HairFlg60 = serializedObject.FindProperty("HairFlg6");
         }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            GUIStyle boxStyle = new(GUI.skin.box)
+
+            EditorGUILayout.PropertyField(heelFlg1, new GUIContent("ヒールON"));
+            EditorGUILayout.PropertyField(heelFlg2, new GUIContent("ハイヒールON"));
+
+            EditorGUILayout.PropertyField(ClothFlg, new GUIContent("衣装メニューのみ削除"));
+            if (!ClothFlg.boolValue)
             {
-                fontSize = 12,
-                alignment = TextAnchor.UpperLeft,
-                padding = new RectOffset(10, 10, 10, 10),
-            };
+                GUI.enabled =
+                    ClothFlg1.boolValue =
+                    ClothFlg2.boolValue =
+                    ClothFlg3.boolValue =
+                    ClothFlg4.boolValue =
+                    ClothFlg5.boolValue =
+                    ClothFlg6.boolValue =
+                    ClothFlg7.boolValue =
+                    ClothFlg8.boolValue =
+                        false;
+            }
+            EditorGUILayout.PropertyField(ClothFlg1, new GUIContent("  ├ ジャケット削除"));
 
-            GUILayout.Box(
-                "選択無しで実行するだけで不要な[パラメーター2bit]と[オブジェクト]\n"
-                    + "が削除されcheckを入れることで該当項目が、削除されます\n"
-                    + "不要な[networkSyncedパラメーター67bit]の同期checkを外します\n"
-                    + "括弧内の数字は削除されるパラメーターの容量になります\n"
-                    + "＊＊＊ツールには、元に戻す機能はありません＊＊＊\n",
-                boxStyle,
-                GUILayout.ExpandWidth(true),
-                GUILayout.Height(95)
-            );
-
-            EditorGUILayout.PropertyField(petFlgProp, new GUIContent("ペット削除(31Bits)"));
-            EditorGUILayout.PropertyField(ClothFlgProp, new GUIContent("衣装削除(7Bits)"));
-            if (!ClothFlgProp.boolValue)
+            EditorGUILayout.PropertyField(ClothFlg2, new GUIContent("  ├ シャツ＆スカート削除"));
+            EditorGUILayout.PropertyField(ClothFlg3, new GUIContent("  ├ アクセサリ削除"));
+            EditorGUILayout.PropertyField(ClothFlg4, new GUIContent("  ├ string削除"));
+            EditorGUILayout.PropertyField(ClothFlg5, new GUIContent("  ├ グローブ削除"));
+            EditorGUILayout.PropertyField(ClothFlg6, new GUIContent("  ├ ソックス削除"));
+            EditorGUILayout.PropertyField(ClothFlg7, new GUIContent("  ├ 靴削除"));
+            EditorGUILayout.PropertyField(ClothFlg8, new GUIContent("  └ 下着削除"));
+            GUI.enabled = true;
+            EditorGUILayout.PropertyField(BreastSizeFlg, new GUIContent("バストサイズ変更削除"));
+            if (!BreastSizeFlg.boolValue)
             {
                 GUI.enabled = false;
-                TailFlgProp.boolValue = false;
+                BreastSizeFlg1.boolValue = false;
+                BreastSizeFlg2.boolValue = false;
+                BreastSizeFlg3.boolValue = false;
+            }
+            EditorGUILayout.PropertyField(BreastSizeFlg1, new GUIContent("  ├ smallにする"));
+            EditorGUILayout.PropertyField(BreastSizeFlg2, new GUIContent("  ├ 100にする"));
+            EditorGUILayout.PropertyField(BreastSizeFlg3, new GUIContent("  └ 瑞希100にする"));
+            GUI.enabled = true;
+            {
+                var RuruneOptimizer = (IllRuruneOptimizer)target;
+                if (BreastSizeFlg1.boolValue != RuruneOptimizer.BreastSizeFlg1)
+                {
+                    BreastSizeFlg2.boolValue = false;
+                    BreastSizeFlg3.boolValue = false;
+                }
+                else if (BreastSizeFlg2.boolValue != RuruneOptimizer.BreastSizeFlg2)
+                {
+                    BreastSizeFlg1.boolValue = false;
+                    BreastSizeFlg3.boolValue = false;
+                }
+                else if (BreastSizeFlg3.boolValue != RuruneOptimizer.BreastSizeFlg3)
+                {
+                    BreastSizeFlg1.boolValue = false;
+                    BreastSizeFlg2.boolValue = false;
+                }
+            }
+            EditorGUILayout.PropertyField(
+                HairFlg,
+                new GUIContent("髪毛/ヘッドフォンをメニューから削除")
+            );
+            if (!HairFlg.boolValue)
+                GUI.enabled =
+                    HairFlg10.boolValue =
+                    HairFlg11.boolValue =
+                    HairFlg20.boolValue =
+                    HairFlg12.boolValue =
+                    HairFlg30.boolValue =
+                    HairFlg60.boolValue =
+                    HairFlg50.boolValue =
+                    HairFlg51.boolValue =
+                    HairFlg40.boolValue =
+                        false;
+            if (HairFlg60.boolValue)
+                GUI.enabled =
+                    HairFlg10.boolValue =
+                    HairFlg11.boolValue =
+                    HairFlg20.boolValue =
+                    HairFlg12.boolValue =
+                    HairFlg30.boolValue =
+                        false;
+            EditorGUILayout.PropertyField(HairFlg10, new GUIContent("  │   ├ ぱっつんON"));
+            if (!HairFlg10.boolValue)
+                GUI.enabled = HairFlg11.boolValue = false;
+            EditorGUILayout.PropertyField(HairFlg11, new GUIContent("  │   │   └ ショートON"));
+            if (HairFlg.boolValue && !HairFlg60.boolValue)
+                GUI.enabled = true;
+            EditorGUILayout.PropertyField(HairFlg20, new GUIContent("  │   ├ 前髪左分けON"));
+            {
+                var RuruneOptimizer = (IllRuruneOptimizer)target;
+                if (HairFlg10.boolValue != RuruneOptimizer.HairFlg1)
+                    HairFlg20.boolValue = false;
+                else if (HairFlg20.boolValue != RuruneOptimizer.HairFlg2)
+                    HairFlg10.boolValue = false;
             }
 
-            EditorGUILayout.PropertyField(TailFlgProp, new GUIContent("尻尾メッシュ削除"));
+            EditorGUILayout.PropertyField(HairFlg22, new GUIContent("  │   ├ 髪留めON"));
+            EditorGUILayout.PropertyField(HairFlg12, new GUIContent("  │   ├ 前髪サイドON"));
+            EditorGUILayout.PropertyField(HairFlg30, new GUIContent("  │   └ サイドON"));
+            if (HairFlg.boolValue)
+                GUI.enabled = true;
+            EditorGUILayout.PropertyField(HairFlg60, new GUIContent("  └ hair削除"));
+            EditorGUILayout.PropertyField(HairFlg50, new GUIContent("      ├ ヘッドホン削除"));
+            if (!HairFlg50.boolValue)
+                GUI.enabled = HairFlg51.boolValue = false;
+            EditorGUILayout.PropertyField(HairFlg51, new GUIContent("      │   └ particle削除"));
+            if (HairFlg.boolValue)
+                GUI.enabled = true;
+            EditorGUILayout.PropertyField(HairFlg40, new GUIContent("      └ hair2削除"));
             GUI.enabled = true;
+            EditorGUILayout.PropertyField(TailFlg, new GUIContent("尻尾削除"));
+            EditorGUILayout.PropertyField(TailFlg1, new GUIContent("  └ リボン削除"));
+            if (TailFlg.boolValue)
+                TailFlg1.boolValue = true;
+            EditorGUILayout.PropertyField(petFlg, new GUIContent("ペット削除"));
+            EditorGUILayout.PropertyField(TPSFlg, new GUIContent("TPS削除"));
+            EditorGUILayout.PropertyField(ClairvoyanceFlg, new GUIContent("透視削除"));
             EditorGUILayout.PropertyField(
-                HairFlgProp,
-                new GUIContent("髪毛/ヘッドフォン削除(8Bits)")
-            );
-
-            EditorGUILayout.PropertyField(TPSFlgProp, new GUIContent("TPS削除(1Bits)"));
-            EditorGUILayout.PropertyField(ClairvoyanceFlgProp, new GUIContent("透視削除(1Bits)"));
-            EditorGUILayout.PropertyField(
-                colliderJumpFlgProp,
+                colliderJumpFlg,
                 new GUIContent("コライダー・ジャンプ削除")
             );
+            EditorGUILayout.PropertyField(pictureFlg, new GUIContent("撮影ギミック削除"));
+            EditorGUILayout.PropertyField(LightGunFlg, new GUIContent("ライトガン削除"));
+            EditorGUILayout.PropertyField(WhiteBreathFlg, new GUIContent("ホワイトブレス削除"));
+            EditorGUILayout.PropertyField(BubbleBreathFlg, new GUIContent("バブルブレス削除"));
+            EditorGUILayout.PropertyField(WaterStampFlg, new GUIContent("ウォータースタンプ削除"));
+            EditorGUILayout.PropertyField(eightBitFlg, new GUIContent("8bit削除"));
+            EditorGUILayout.PropertyField(PenCtrlFlg, new GUIContent("ペン操作削除"));
+            EditorGUILayout.PropertyField(HeartGunFlg, new GUIContent("ハートガン削除"));
             EditorGUILayout.PropertyField(
-                pictureFlgProp,
-                new GUIContent("撮影ギミック削除(6Bits)")
-            );
-            EditorGUILayout.PropertyField(
-                BreastSizeFlgProp,
-                new GUIContent("バストサイズ削除(8Bits)")
-            );
-            EditorGUILayout.PropertyField(
-                LightGunFlgProp,
-                new GUIContent("ライトガン削除(13Bits)")
-            );
-            EditorGUILayout.PropertyField(
-                WhiteBreathFlgProp,
-                new GUIContent("ホワイトブレス削除(1Bits)")
-            );
-            EditorGUILayout.PropertyField(
-                BubbleBreathFlgProp,
-                new GUIContent("バブルブレス削除(1Bits)")
-            );
-            EditorGUILayout.PropertyField(
-                WaterStampFlgProp,
-                new GUIContent("ウォータースタンプ削除(1Bits)")
-            );
-            EditorGUILayout.PropertyField(eightBitFlgProp, new GUIContent("8bit削除(1Bits)"));
-            EditorGUILayout.PropertyField(PenCtrlFlgProp, new GUIContent("ペン操作削除(5Bits)"));
-            EditorGUILayout.PropertyField(HeartGunFlgProp, new GUIContent("ハートガン削除(1Bits)"));
-            EditorGUILayout.PropertyField(
-                FaceGestureFlgProp,
+                FaceGestureFlg,
                 new GUIContent("デフォルトの表情プリセット削除(faceEmoなど使う場合)")
             );
-            EditorGUILayout.PropertyField(FaceLockFlgProp, new GUIContent("表情固定機能削除"));
-            EditorGUILayout.PropertyField(FaceValFlgProp, new GUIContent("顔差分変更機能削除"));
+            EditorGUILayout.PropertyField(FaceLockFlg, new GUIContent("表情固定機能削除"));
+            EditorGUILayout.PropertyField(FaceValFlg, new GUIContent("顔差分変更機能削除"));
             EditorGUILayout.PropertyField(
-                blinkFlgProp,
+                blinkFlg,
                 new GUIContent("まばたきをメニューから削除して常にON")
             );
             EditorGUILayout.PropertyField(
-                nadeFlgProp,
+                nadeFlg,
                 new GUIContent("なでギミックをメニューから削除して常にON")
             );
             EditorGUILayout.PropertyField(
-                kamitukiFlgProp,
+                kamitukiFlg,
                 new GUIContent("噛みつきをメニューから削除して常にON")
             );
             EditorGUILayout.PropertyField(
-                IKUSIA_emoteProp,
+                IKUSIA_emote,
                 new GUIContent("IKUSIA_emoteをメニューのみ削除")
             );
+            if (!IKUSIA_emote.boolValue)
+            {
+                GUI.enabled = IKUSIA_emote1.boolValue = false;
+            }
+            EditorGUILayout.PropertyField(IKUSIA_emote1, new GUIContent("  └ 手動のAFKは残す"));
+            GUI.enabled = true;
+
             // Execute ボタンの追加
             if (GUILayout.Button("Execute"))
             {
@@ -198,9 +319,9 @@ namespace jp.illusive_isc.RuruneOptimizer
             );
             GUI.enabled = false;
             EditorGUILayout.Space();
-            EditorGUILayout.PropertyField(controllerDefProp, new GUIContent("Animator Controller"));
-            EditorGUILayout.PropertyField(menuDefProp, new GUIContent("Expressions Menu"));
-            EditorGUILayout.PropertyField(paramDefProp, new GUIContent("Expression Parameters"));
+            EditorGUILayout.PropertyField(controllerDef, new GUIContent("Animator Controller"));
+            EditorGUILayout.PropertyField(menuDef, new GUIContent("Expressions Menu"));
+            EditorGUILayout.PropertyField(paramDef, new GUIContent("Expression Parameters"));
             GUI.enabled = true;
             EditorGUILayout.Space();
             GUILayout.TextField(
@@ -213,9 +334,9 @@ namespace jp.illusive_isc.RuruneOptimizer
                 }
             );
             EditorGUILayout.Space();
-            EditorGUILayout.PropertyField(controllerProp, new GUIContent("Animator Controller"));
-            EditorGUILayout.PropertyField(menuProp, new GUIContent("Expressions Menu"));
-            EditorGUILayout.PropertyField(paramProp, new GUIContent("Expression Parameters"));
+            EditorGUILayout.PropertyField(controller, new GUIContent("Animator Controller"));
+            EditorGUILayout.PropertyField(menu, new GUIContent("Expressions Menu"));
+            EditorGUILayout.PropertyField(param, new GUIContent("Expression Parameters"));
 
             // 変更内容の適用
             serializedObject.ApplyModifiedProperties();

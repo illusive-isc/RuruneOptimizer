@@ -81,8 +81,63 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamBreastSize DestroyObj()
+        public IllRuruneParamBreastSize DestroyObj(
+            bool breastSizeFlg1,
+            bool breastSizeFlg2,
+            bool breastSizeFlg3
+        )
         {
+            var Body_b = descriptor.transform.Find("Body_b");
+            if (Body_b)
+                if (Body_b.TryGetComponent<SkinnedMeshRenderer>(out var Body_bSMR))
+                {
+                    Body_bSMR.SetBlendShapeWeight(1, breastSizeFlg1 ? 100 : 0);
+                    Body_bSMR.SetBlendShapeWeight(2, breastSizeFlg2 ? 100 : 0);
+                    Body_bSMR.SetBlendShapeWeight(3, breastSizeFlg3 ? 100 : 0);
+                }
+            var acce = descriptor.transform.Find("acce");
+            if (acce)
+                if (acce.TryGetComponent<SkinnedMeshRenderer>(out var acceSMR))
+                {
+                    acceSMR.SetBlendShapeWeight(0, breastSizeFlg1 ? 100 : 0);
+                    acceSMR.SetBlendShapeWeight(
+                        1,
+                        breastSizeFlg2 ? 100
+                            : breastSizeFlg3 ? 200
+                            : 0
+                    );
+                }
+            var cloth = descriptor.transform.Find("cloth");
+            if (cloth)
+                if (cloth.TryGetComponent<SkinnedMeshRenderer>(out var clothSMR))
+                {
+                    clothSMR.SetBlendShapeWeight(0, breastSizeFlg1 ? 100 : 0);
+                    clothSMR.SetBlendShapeWeight(
+                        1,
+                        breastSizeFlg2 ? 100
+                            : breastSizeFlg3 ? 202
+                            : 0
+                    );
+                }
+            var jacket = descriptor.transform.Find("jacket");
+            if (jacket)
+                if (jacket.TryGetComponent<SkinnedMeshRenderer>(out var jacketSMR))
+                {
+                    jacketSMR.SetBlendShapeWeight(
+                        1,
+                        breastSizeFlg2 ? 100
+                            : breastSizeFlg3 ? 200
+                            : 0
+                    );
+                }
+            var underwear = descriptor.transform.Find("underwear");
+            if (underwear)
+                if (underwear.TryGetComponent<SkinnedMeshRenderer>(out var underwearSMR))
+                {
+                    underwearSMR.SetBlendShapeWeight(0, breastSizeFlg1 ? 100 : 0);
+                    underwearSMR.SetBlendShapeWeight(1, breastSizeFlg2 ? 100 : 0);
+                    underwearSMR.SetBlendShapeWeight(2, breastSizeFlg3 ? 100 : 0);
+                }
             return this;
         }
     }

@@ -90,46 +90,111 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamCloth DestroyObjAll(bool TailFlg)
+        public IllRuruneParamCloth DestroyObjAll(
+            bool TailFlg,
+            bool clothFlg1,
+            bool clothFlg2,
+            bool clothFlg3,
+            bool clothFlg4,
+            bool clothFlg5,
+            bool clothFlg6,
+            bool clothFlg7,
+            bool clothFlg8,
+            bool heelFlg1,
+            bool heelFlg2
+        )
         {
             var underwear = descriptor.transform.Find("underwear");
             if (underwear)
-            {
-                underwear.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(3, 0);
-                underwear.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(4, 0);
-            }
-            DestroyObj(descriptor.transform.Find("acce"));
-            DestroyObj(descriptor.transform.Find("boots"));
-            DestroyObj(descriptor.transform.Find("cloth"));
-            DestroyObj(descriptor.transform.Find("gloves"));
-            DestroyObj(descriptor.transform.Find("jacket"));
-            DestroyObj(descriptor.transform.Find("knee-socks"));
-            DestroyObj(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_back")
-            );
-            DestroyObj(descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L"));
-            DestroyObj(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L.007")
-            );
-            DestroyObj(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L.012")
-            );
-            DestroyObj(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L.017")
-            );
-            DestroyObj(descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R"));
-            DestroyObj(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R.007")
-            );
-            DestroyObj(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R.012")
-            );
-            DestroyObj(
-                descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R.017")
-            );
+                if (underwear.TryGetComponent<SkinnedMeshRenderer>(out var underwearSMR))
+                {
+                    underwearSMR.SetBlendShapeWeight(3, clothFlg1 || clothFlg2 ? 0 : 100);
+                    underwearSMR.SetBlendShapeWeight(4, clothFlg4 ? 100 : 0);
+                }
+            var jacket = descriptor.transform.Find("jacket");
+            if (jacket)
+                if (jacket.TryGetComponent<SkinnedMeshRenderer>(out var jacketSMR))
+                {
+                    jacketSMR.SetBlendShapeWeight(2, TailFlg ? 100 : 0);
+                }
+            var cloth = descriptor.transform.Find("cloth");
+            if (cloth)
+                if (cloth.TryGetComponent<SkinnedMeshRenderer>(out var clothSMR))
+                {
+                    clothSMR.SetBlendShapeWeight(2, clothFlg1 ? 0 : 100);
+                    clothSMR.SetBlendShapeWeight(4, TailFlg ? 100 : 0);
+                }
+            var acce = descriptor.transform.Find("acce");
+            if (acce)
+                if (acce.TryGetComponent<SkinnedMeshRenderer>(out var acceSMR))
+                {
+                    acceSMR.SetBlendShapeWeight(3, clothFlg2 ? 100 : 0);
+                    acceSMR.SetBlendShapeWeight(5, TailFlg ? 100 : 0);
+                }
+            var knee_socks = descriptor.transform.Find("knee-socks");
+            if (knee_socks)
+                if (knee_socks.TryGetComponent<SkinnedMeshRenderer>(out var knee_socksSMR))
+                {
+                    knee_socksSMR.SetBlendShapeWeight(0, heelFlg1 ? 0 : 100);
+                    knee_socksSMR.SetBlendShapeWeight(1, heelFlg2 ? 100 : 0);
+                }
+
+            if (clothFlg1)
+                DestroyObj(jacket);
+            if (clothFlg2)
+                DestroyObj(cloth);
+
+            if (clothFlg1 && clothFlg2)
+                DestroyObjcloth(TailFlg);
+            if (clothFlg3)
+                DestroyObj(acce);
+
+            if (clothFlg5)
+                DestroyObj(descriptor.transform.Find("gloves"));
+            if (clothFlg6)
+                DestroyObj(knee_socks);
+            if (clothFlg7)
+                DestroyObj(descriptor.transform.Find("boots"));
+            if (clothFlg8)
+                DestroyObj(underwear);
+
+            return this;
+        }
+
+        private void DestroyObjcloth(bool TailFlg)
+        {
             if (TailFlg)
                 DestroyObj(descriptor.transform.Find("Armature/Hips/Skirt_Root"));
-            return this;
+            else
+            {
+                DestroyObj(
+                    descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_back")
+                );
+                DestroyObj(
+                    descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L")
+                );
+                DestroyObj(
+                    descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L.007")
+                );
+                DestroyObj(
+                    descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L.012")
+                );
+                DestroyObj(
+                    descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L/Skirt_L.017")
+                );
+                DestroyObj(
+                    descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R")
+                );
+                DestroyObj(
+                    descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R.007")
+                );
+                DestroyObj(
+                    descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R.012")
+                );
+                DestroyObj(
+                    descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R/Skirt_R.017")
+                );
+            }
         }
     }
 }

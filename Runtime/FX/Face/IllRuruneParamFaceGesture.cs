@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
@@ -69,7 +70,42 @@ namespace jp.illusive_isc.RuruneOptimizer
                         }
                         layer.stateMachine.states = states;
                     }
+                    if (layer.name is "LeftHand")
+                    {
+                        var states = layer.stateMachine.states;
 
+                        foreach (var state in states)
+                        {
+                            if (state.state.name == "Fist")
+                            {
+                                var parentBlendTree = state.state.motion as BlendTree;
+                                var newMotion = AssetDatabase.LoadAssetAtPath<Motion>(
+                                    AssetDatabase.GUIDToAssetPath(
+                                        "98312d40fa1bc1e4b94c1591f9e0a60a"
+                                    )
+                                );
+                                state.state.motion = newMotion;
+                            }
+                        }
+                    }
+                    if (layer.name is "RightHand")
+                    {
+                        var states = layer.stateMachine.states;
+
+                        foreach (var state in states)
+                        {
+                            if (state.state.name == "Fist")
+                            {
+                                var parentBlendTree = state.state.motion as BlendTree;
+                                var newMotion = AssetDatabase.LoadAssetAtPath<Motion>(
+                                    AssetDatabase.GUIDToAssetPath(
+                                        "d2b58a77610afb04299ee99777646fad"
+                                    )
+                                );
+                                state.state.motion = newMotion;
+                            }
+                        }
+                    }
                     var stateMachine = layer.stateMachine;
                     foreach (var t in stateMachine.anyStateTransitions)
                         t.conditions = t.conditions.Where(c => c.parameter != "FaceLock").ToArray();
@@ -92,12 +128,21 @@ namespace jp.illusive_isc.RuruneOptimizer
                                     or "RockNRoll 0"
                                     or "Gun 0"
                                     or "Thumbs up 0"
+                                    or "Facevariation on"
                             )
                         )
                         .ToArray();
 
-                    var stateMachine = layer.stateMachine;
-                    foreach (var t in stateMachine.anyStateTransitions)
+                    var sm = layer.stateMachine;
+                    sm.anyStateTransitions = sm
+                        .anyStateTransitions.Where(t =>
+                            !t.conditions.Any(c =>
+                                c.parameter == "Face_variation"
+                                && c.mode == AnimatorConditionMode.If
+                            )
+                        )
+                        .ToArray();
+                    foreach (var t in sm.anyStateTransitions)
                         t.conditions = t
                             .conditions.Where(c => c.parameter != "Face_variation")
                             .ToArray();

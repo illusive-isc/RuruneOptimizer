@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
@@ -107,56 +108,86 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamHair EditorOnly()
+        public IllRuruneParamHair DestroyObj(
+            bool HairFlg1,
+            bool HairFlg11,
+            bool HairFlg12,
+            bool HairFlg2,
+            bool HairFlg22,
+            bool HairFlg3,
+            bool HairFlg4,
+            bool HairFlg5,
+            bool HairFlg51,
+            bool HairFlg6
+        )
         {
-            EditorOnly(descriptor.transform.Find("hair"));
-            EditorOnly(descriptor.transform.Find("hair_2"));
-            EditorOnly(descriptor.transform.Find("Armature/plane_collider"));
-            EditorOnly(descriptor.transform.Find("Advanced/Hair_Ground"));
-            EditorOnly(descriptor.transform.Find("Advanced/Hair_Contact"));
-            EditorOnly(descriptor.transform.Find("hair"));
+            var hair = descriptor.transform.Find("hair");
+            if (hair)
+                if (hair.TryGetComponent<SkinnedMeshRenderer>(out var hairSMR))
+                {
+                    hairSMR.SetBlendShapeWeight(0, HairFlg1 ? 100 : 0);
+                    hairSMR.SetBlendShapeWeight(1, HairFlg12 ? 0 : 100);
 
-            EditorOnly(descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/Hair_root"));
+                    hairSMR.SetBlendShapeWeight(2, HairFlg5 ? 0 : 100);
+                    hairSMR.SetBlendShapeWeight(3, HairFlg3 ? 0 : 100);
+                    hairSMR.SetBlendShapeWeight(4, HairFlg22 ? 100 : 0);
+                    hairSMR.SetBlendShapeWeight(5, HairFlg2 ? 100 : 0);
+                    hairSMR.SetBlendShapeWeight(6, HairFlg11 ? 100 : 0);
+                }
 
-            return this;
-        }
-
-        public IllRuruneParamHair DestroyObj()
-        {
-            DestroyObj(descriptor.transform.Find("hair"));
-            DestroyObj(descriptor.transform.Find("hair_2"));
-            DestroyObj(descriptor.transform.Find("Armature/plane_collider"));
-            DestroyObj(descriptor.transform.Find("Advanced/Hair_Ground"));
-            DestroyObj(descriptor.transform.Find("Advanced/Hair_Contact"));
-            DestroyObj(descriptor.transform.Find("hair"));
-            DestroyObj(
-                descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/headphone_particle")
-            );
-            DestroyObj(
-                descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/rurune_headphone")
-            );
-
-            DestroyObj(descriptor.transform.Find("Advanced/Particle/4"));
-            DestroyObj(descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/Hair_root"));
-            foreach (
-                var physBoneCollider in descriptor
-                    .transform.Find("Armature")
-                    .GetComponentsInChildren<VRCPhysBoneColliderBase>()
-            )
+            if (HairFlg4)
+                DestroyObj(descriptor.transform.Find("hair_2"));
+            if (HairFlg6)
             {
-                if (
-                    !(
-                        physBoneCollider.gameObject.name
-                        is "plane_tail_collider"
-                            or "Breast_L"
-                            or "Breast_R"
-                    )
+                DestroyObj(descriptor.transform.Find("hair"));
+                DestroyObj(descriptor.transform.Find("Armature/plane_collider"));
+                DestroyObj(descriptor.transform.Find("Advanced/Hair_Ground"));
+                DestroyObj(descriptor.transform.Find("Advanced/Hair_Contact"));
+                DestroyObj(
+                    descriptor.transform.Find("Armature/Hips/Spine/Chest/Neck/Head/Hair_root")
+                );
+                foreach (
+                    var physBoneCollider in descriptor
+                        .transform.Find("Armature")
+                        .GetComponentsInChildren<VRCPhysBoneColliderBase>()
                 )
-                    DestroyImmediate(physBoneCollider.gameObject);
-                else if (physBoneCollider.gameObject.name is "Breast_L" or "Breast_R")
-                    DestroyImmediate(physBoneCollider);
+                {
+                    if (
+                        !(
+                            physBoneCollider.gameObject.name
+                            is "plane_tail_collider"
+                                or "Breast_L"
+                                or "Breast_R"
+                        )
+                    )
+                        DestroyImmediate(physBoneCollider.gameObject);
+                    else if (physBoneCollider.gameObject.name is "Breast_L" or "Breast_R")
+                        DestroyImmediate(physBoneCollider);
+                }
             }
 
+            var headphone = descriptor.transform.Find(
+                "Armature/Hips/Spine/Chest/Neck/Head/rurune_headphone"
+            );
+            if (headphone)
+                if (HairFlg5)
+                    DestroyObj(headphone);
+                else
+                    headphone.gameObject.SetActive(true);
+
+            var particle = descriptor.transform.Find("Advanced/Particle/4");
+            if (particle)
+                if (HairFlg51)
+                {
+                    DestroyObj(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/headphone_particle"
+                        )
+                    );
+                    DestroyObj(descriptor.transform.Find("Advanced/Particle/4"));
+                }
+                else
+                    descriptor.transform.Find("Advanced/Particle/4").gameObject.SetActive(true);
             return this;
         }
     }
