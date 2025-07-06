@@ -130,9 +130,6 @@ namespace jp.illusive_isc.RuruneOptimizer
         private bool HeartGunFlg = false;
 
         [SerializeField]
-        private bool FaceFlg = false;
-
-        [SerializeField]
         private bool FaceGestureFlg = false;
 
         [SerializeField]
@@ -584,7 +581,7 @@ namespace jp.illusive_isc.RuruneOptimizer
 
             // 新規に複製した AnimatorController をアセットとして保存
             EditorUtility.SetDirty(controller);
-            EditorUtility.SetDirty(menu);
+            MarkAllMenusDirty(menu);
             EditorUtility.SetDirty(param);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -597,7 +594,20 @@ namespace jp.illusive_isc.RuruneOptimizer
 
             Debug.Log("最適化を実行しました！");
         }
+        private static void MarkAllMenusDirty(VRCExpressionsMenu menu)
+        {
+            if (menu == null) return;
 
+            EditorUtility.SetDirty(menu);
+
+            foreach (var control in menu.controls)
+            {
+                if (control.subMenu != null)
+                {
+                    MarkAllMenusDirty(control.subMenu);
+                }
+            }
+        }
         /// <summary>
         /// Expression Menu の複製（サブメニューも再帰的に複製）
         /// </summary>
