@@ -88,7 +88,7 @@ namespace jp.illusive_isc.RuruneOptimizer
         private bool TailFlg = false;
 
         [SerializeField]
-        private bool TailFlg1 = true;
+        private bool TailFlg1 = false;
 
         [SerializeField]
         private bool TPSFlg = false;
@@ -308,7 +308,8 @@ namespace jp.illusive_isc.RuruneOptimizer
                         HairFlg4,
                         HairFlg5,
                         HairFlg51,
-                        HairFlg6
+                        HairFlg6,
+                        TailFlg
                     );
             }
 

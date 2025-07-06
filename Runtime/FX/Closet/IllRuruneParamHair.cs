@@ -118,7 +118,8 @@ namespace jp.illusive_isc.RuruneOptimizer
             bool HairFlg4,
             bool HairFlg5,
             bool HairFlg51,
-            bool HairFlg6
+            bool HairFlg6,
+            bool tailFlg
         )
         {
             var hair = descriptor.transform.Find("hair");
@@ -155,9 +156,15 @@ namespace jp.illusive_isc.RuruneOptimizer
                     if (
                         !(
                             physBoneCollider.gameObject.name
-                            is "plane_tail_collider"
-                                or "Breast_L"
-                                or "Breast_R"
+                                is "plane_tail_collider"
+                                    or "Breast_L"
+                                    or "Breast_R"
+                            || !tailFlg
+                                && physBoneCollider.gameObject.name
+                                    is "head_collider"
+                                        or "chest_collider"
+                                        or "upperleg_L_collider"
+                                        or "upperleg_R_collider"
                         )
                     )
                         DestroyImmediate(physBoneCollider.gameObject);
