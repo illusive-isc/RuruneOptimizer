@@ -127,13 +127,54 @@ namespace jp.illusive_isc.RuruneOptimizer
                 if (hair.TryGetComponent<SkinnedMeshRenderer>(out var hairSMR))
                 {
                     hairSMR.SetBlendShapeWeight(0, HairFlg1 ? 100 : 0);
+                    hairSMR.SetBlendShapeWeight(6, HairFlg11 ? 100 : 0);
+                    hairSMR.SetBlendShapeWeight(3, HairFlg2 ? 0 : 100);
+                    hairSMR.SetBlendShapeWeight(4, HairFlg22 ? 100 : 0);
                     hairSMR.SetBlendShapeWeight(1, HairFlg12 ? 0 : 100);
+                    hairSMR.SetBlendShapeWeight(5, HairFlg3 ? 0 : 100);
 
                     hairSMR.SetBlendShapeWeight(2, HairFlg5 ? 0 : 100);
-                    hairSMR.SetBlendShapeWeight(3, HairFlg3 ? 0 : 100);
-                    hairSMR.SetBlendShapeWeight(4, HairFlg22 ? 100 : 0);
-                    hairSMR.SetBlendShapeWeight(5, HairFlg2 ? 100 : 0);
-                    hairSMR.SetBlendShapeWeight(6, HairFlg11 ? 100 : 0);
+                    var hairRoot = descriptor.transform.Find(
+                        "Armature/Hips/Spine/Chest/Neck/Head/Hair_root"
+                    );
+                    if (hairRoot)
+                    {
+                        if (
+                            hairRoot
+                                .Find("Front_hair1_root/Head.002")
+                                .TryGetComponent<VRCPhysBoneBase>(out var Front_hair1_root)
+                        )
+                        {
+                            Front_hair1_root.enabled = !HairFlg1;
+                        }
+
+                        if (
+                            hairRoot
+                                .Find("Front_hair2_root")
+                                .TryGetComponent<VRCPhysBoneBase>(out var Front_hair2_root)
+                        )
+                        {
+                            Front_hair2_root.enabled = HairFlg1;
+                        }
+
+                        if (
+                            hairRoot
+                                .Find("side_1_root")
+                                .TryGetComponent<VRCPhysBoneBase>(out var side_1_root)
+                        )
+                        {
+                            side_1_root.enabled = HairFlg12;
+                        }
+
+                        if (
+                            hairRoot
+                                .Find("Side_root")
+                                .TryGetComponent<VRCPhysBoneBase>(out var Side_root)
+                        )
+                        {
+                            Side_root.enabled = HairFlg3;
+                        }
+                    }
                 }
 
             if (HairFlg4)
