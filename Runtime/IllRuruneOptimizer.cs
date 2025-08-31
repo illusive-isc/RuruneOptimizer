@@ -4,6 +4,11 @@ using UnityEngine;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDKBase;
+using System.Collections.Generic;
+using System.Linq;
+
+
+
 #if UNITY_EDITOR
 using UnityEditor.Animations;
 
@@ -578,7 +583,36 @@ namespace jp.illusive_isc.RuruneOptimizer
                     }
                 }
             }
+            var assetGuids = AssetDatabase.FindAssets(
+                "t:VRCExpressionsMenu",
+                new[] { pathDir + "Menu" }
+            );
 
+            Dictionary<string, VRCExpressionsMenu> menus = new();
+            foreach (var guid in assetGuids)
+            {
+                menus.Add(
+                    guid,
+                    AssetDatabase.LoadAssetAtPath<VRCExpressionsMenu>(
+                        AssetDatabase.GUIDToAssetPath(guid)
+                    )
+                );
+            }
+            foreach (var menuItem in menus)
+            {
+                var delFlg = true;
+                if (menuItem.Value.controls.Any(p => p.parameter.name == ""))
+                    continue;
+                foreach (var control in menuItem.Value.controls)
+                    if (!string.IsNullOrEmpty(control.parameter.name))
+                        if (param.parameters.Any(p => p.name == control.parameter.name))
+                        {
+                            delFlg = false;
+                            break;
+                        }
+                if (delFlg)
+                    AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(menuItem.Key));
+            }
             // 新規に複製した AnimatorController をアセットとして保存
             EditorUtility.SetDirty(controller);
             MarkAllMenusDirty(menu);
@@ -594,9 +628,11 @@ namespace jp.illusive_isc.RuruneOptimizer
 
             Debug.Log("最適化を実行しました！");
         }
+
         private static void MarkAllMenusDirty(VRCExpressionsMenu menu)
         {
-            if (menu == null) return;
+            if (menu == null)
+                return;
 
             EditorUtility.SetDirty(menu);
 
@@ -608,6 +644,7 @@ namespace jp.illusive_isc.RuruneOptimizer
                 }
             }
         }
+
         /// <summary>
         /// Expression Menu の複製（サブメニューも再帰的に複製）
         /// </summary>
