@@ -238,6 +238,21 @@ namespace jp.illusive_isc.RuruneOptimizer
                     descriptor.transform.Find("Advanced/Particle/4").gameObject.SetActive(true);
             return this;
         }
+
+        public IllRuruneParamHair DestroyObj4Quest(bool questFlg1)
+        {
+            if (descriptor.transform.Find("Advanced/Particle/4"))
+                if (questFlg1)
+                {
+                    DestroyObj(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/headphone_particle"
+                        )
+                    );
+                    DestroyObj(descriptor.transform.Find("Advanced/Particle/4"));
+                }
+            return this;
+        }
     }
 }
 #endif

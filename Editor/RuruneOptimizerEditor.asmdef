@@ -1,8 +1,13 @@
 {
-    "name": "jp.illusive_isc.RuruneOptimizer",
+    "name": "jp.illusive_isc.RuruneOptimizerEditor",
     "rootNamespace": "jp.illusive_isc.RuruneOptimizer",
     "references": [
-        "com.anatawa12.avatar-optimizer.runtime"
+        "jp.illusive_isc.RuruneOptimizer",
+        "com.anatawa12.avatar-optimizer.runtime",
+        "nadena.dev.modular-avatar.core",
+        "nadena.dev.ndmf",
+        "nadena.dev.ndmf.runtime",
+        "com.anatawa12.avatar-optimizer.internal.prefab-safe-set.editor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

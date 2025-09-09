@@ -1,14 +1,15 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDKBase;
-using System.Collections.Generic;
-using System.Linq;
-
-
-
+#if AVATAR_OPTIMIZER_FOUND
+using Anatawa12.AvatarOptimizer;
+#endif
 #if UNITY_EDITOR
 using UnityEditor.Animations;
 
@@ -158,6 +159,56 @@ namespace jp.illusive_isc.RuruneOptimizer
         [SerializeField]
         private bool IKUSIA_emote1 = true;
 
+        [SerializeField]
+        private bool questFlg1 = false;
+
+        public bool Skirt_Root;
+
+        public bool Breast;
+
+        public bool backhair;
+
+        public bool back_side_root;
+
+        public bool Head_002;
+
+        public bool Front_hair2_root;
+
+        public bool side_1_root;
+
+        public bool hair_2;
+
+        public bool sidehair;
+
+        public bool side_3_root;
+
+        public bool Side_root;
+
+        public bool tail_044;
+
+        public bool tail_022;
+
+        public bool tail_024;
+
+        public bool chest_collider1;
+        public bool chest_collider2;
+
+        public bool upperleg_collider1;
+        public bool upperleg_collider2;
+        public bool upperleg_collider3;
+
+        public bool upperArm_collider;
+
+        public bool head_collider1;
+        public bool head_collider2;
+
+        public bool Breast_collider;
+
+        public bool plane_collider;
+        public bool AAORemoveFlg;
+
+        [SerializeField]
+        bool plane_tail_collider;
         public AnimatorController controllerDef;
         public VRCExpressionsMenu menuDef;
         public VRCExpressionParameters paramDef;
@@ -167,6 +218,15 @@ namespace jp.illusive_isc.RuruneOptimizer
         public VRCExpressionParameters param;
 
         private string pathDir;
+
+        public enum TextureResizeOption
+        {
+            LowerResolution, // 下げる
+            Delete, // 削除
+        }
+
+        // Inspector で選択する値
+        public TextureResizeOption textureResize = TextureResizeOption.LowerResolution;
 
         public void Execute(VRCAvatarDescriptor descriptor)
         {
@@ -207,7 +267,13 @@ namespace jp.illusive_isc.RuruneOptimizer
                     );
                 menuDef = descriptor.expressionsMenu;
             }
-            menu = DuplicateExpressionMenu(menuDef, pathDir);
+            Dictionary<string, string> menu1 = new();
+            var iconPath = pathDir + "/icon";
+            if (!Directory.Exists(iconPath))
+            {
+                Directory.CreateDirectory(iconPath);
+            }
+            menu = DuplicateExpressionMenu(menuDef, pathDir, iconPath, questFlg1, textureResize);
 
             // ExpressionParameters の複製
             if (!paramDef)
@@ -291,28 +357,31 @@ namespace jp.illusive_isc.RuruneOptimizer
                     body_bSMR.SetBlendShapeWeight(29, heelFlg2 ? 100 : 0);
                 }
 
-            if (HairFlg)
+            if (HairFlg || questFlg1)
             {
                 IllRuruneParamHair illRuruneParamHair =
                     ScriptableObject.CreateInstance<IllRuruneParamHair>();
-                illRuruneParamHair
-                    .Initialize(descriptor, controller)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj(
-                        HairFlg1,
-                        HairFlg11,
-                        HairFlg12,
-                        HairFlg2,
-                        HairFlg22,
-                        HairFlg3,
-                        HairFlg4,
-                        HairFlg5,
-                        HairFlg51,
-                        HairFlg6,
-                        TailFlg
-                    );
+                illRuruneParamHair.Initialize(descriptor, controller);
+                if (HairFlg)
+                    illRuruneParamHair
+                        .DeleteFxBT()
+                        .DeleteParam()
+                        .DeleteVRCExpressions(menu, param)
+                        .DestroyObj(
+                            HairFlg1,
+                            HairFlg11,
+                            HairFlg12,
+                            HairFlg2,
+                            HairFlg22,
+                            HairFlg3,
+                            HairFlg4,
+                            HairFlg5,
+                            HairFlg51,
+                            HairFlg6,
+                            TailFlg
+                        );
+                if (questFlg1)
+                    illRuruneParamHair.DestroyObj4Quest(questFlg1);
             }
 
             if (TPSFlg)
@@ -583,6 +652,539 @@ namespace jp.illusive_isc.RuruneOptimizer
                     }
                 }
             }
+            if (questFlg1)
+            {
+                var AFK_World = descriptor.transform.Find("Advanced/AFK_World/position");
+
+                IllRuruneParam.DestroyObj(AFK_World.Find("water2"));
+                IllRuruneParam.DestroyObj(AFK_World.Find("water3"));
+                IllRuruneParam.DestroyObj(AFK_World.Find("AFKIN Particle"));
+                IllRuruneParam.DestroyObj(AFK_World.Find("swim"));
+                IllRuruneParam.DestroyObj(AFK_World.Find("IdolParticle"));
+
+                if (Skirt_Root)
+                    DelPBByPathArray(
+                        descriptor,
+                        new string[]
+                        {
+                            "Armature/Hips/Skirt_Root/Skirt_Root_L",
+                            "Armature/Hips/Skirt_Root/Skirt_Root_R",
+                        }
+                    );
+
+                if (Breast)
+                {
+                    DelPBByPathArray(
+                        descriptor,
+                        new string[]
+                        {
+                            "Armature/Hips/Spine/Chest/Breast_L",
+                            "Armature/Hips/Spine/Chest/Breast_R",
+                        }
+                    );
+                }
+                if (backhair)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
+                        )
+                    );
+
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
+                        )
+                    );
+                }
+                if (back_side_root)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_side_root"
+                        )
+                    );
+                }
+                if (Head_002)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/Front_hair1_root/Head.002"
+                        )
+                    );
+                }
+                if (Front_hair2_root)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/Front_hair2_root"
+                        )
+                    );
+                }
+                if (side_1_root)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_1_root"
+                        )
+                    );
+                }
+                if (sidehair)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_2_root/side_ani_L/sidehair_L.003"
+                        )
+                    );
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_2_root/side_ani_R/sidehair_R.003"
+                        )
+                    );
+                }
+                if (sidehair)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_2_root/sidehair_L"
+                        )
+                    );
+
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_2_root/sidehair_R"
+                        )
+                    );
+                }
+                if (side_3_root)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_3_root"
+                        )
+                    );
+                }
+                if (Side_root)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/Side_root"
+                        )
+                    );
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find("Armature/Hips/Spine/Chest/Breast_L")
+                    );
+
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find("Armature/Hips/Spine/Chest/Breast_R")
+                    );
+                }
+                if (tail_044)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find("Armature/Hips/tail/tail.044")
+                    );
+                }
+                if (tail_022)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/tail/tail.044/tail.001/tail.002/tail.003/tail.004/tail.005/tail.006/tail.007/tail.008/tail.009/tail.010/tail.011/tail.012/tail.013/tail.014/tail.018/tail.021/tail.022"
+                        )
+                    );
+
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/tail/tail.044/tail.001/tail.002/tail.003/tail.004/tail.005/tail.006/tail.007/tail.008/tail.009/tail.010/tail.011/tail.012/tail.013/tail.014/tail.018/tail.021/tail.024"
+                        )
+                    );
+                }
+                if (chest_collider1)
+                {
+                    {
+                        if (
+                            descriptor.transform.Find(
+                                "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
+                            )
+                        )
+                        {
+                            var physBone = descriptor
+                                .transform.Find(
+                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
+                                )
+                                .GetComponent<VRCPhysBoneBase>();
+                            if (physBone != null && physBone.colliders != null)
+                            {
+                                // chest_collider という名前が付いたコライダーのみ削除
+                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
+                                {
+                                    var collider = physBone.colliders[i];
+                                    if (
+                                        collider != null
+                                        && collider.name.Contains("chest_collider")
+                                    )
+                                    {
+                                        physBone.colliders.RemoveAt(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    {
+                        if (
+                            descriptor.transform.Find(
+                                "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
+                            )
+                        )
+                        {
+                            var physBone = descriptor
+                                .transform.Find(
+                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
+                                )
+                                .GetComponent<VRCPhysBoneBase>();
+                            if (physBone != null && physBone.colliders != null)
+                            {
+                                // chest_collider という名前が付いたコライダーのみ削除
+                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
+                                {
+                                    var collider = physBone.colliders[i];
+                                    if (
+                                        collider != null
+                                        && collider.name.Contains("chest_collider")
+                                    )
+                                    {
+                                        physBone.colliders.RemoveAt(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (chest_collider2)
+                {
+                    {
+                        if (descriptor.transform.Find("Armature/Hips/tail/tail.044"))
+                        {
+                            var physBone = descriptor
+                                .transform.Find("Armature/Hips/tail/tail.044")
+                                .GetComponent<VRCPhysBoneBase>();
+                            if (physBone != null && physBone.colliders != null)
+                            {
+                                // chest_collider という名前が付いたコライダーのみ削除
+                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
+                                {
+                                    var collider = physBone.colliders[i];
+                                    if (
+                                        collider != null
+                                        && collider.name.Contains("chest_collider")
+                                    )
+                                    {
+                                        physBone.colliders.RemoveAt(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (chest_collider1 && chest_collider2)
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
+                        descriptor.transform.Find("Armature/Hips/Spine/Chest/chest_collider")
+                    );
+                if (upperleg_collider1)
+                {
+                    if (
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
+                        )
+                    )
+                    {
+                        {
+                            var physBone = descriptor
+                                .transform.Find(
+                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
+                                )
+                                .GetComponent<VRCPhysBoneBase>();
+                            if (physBone != null && physBone.colliders != null)
+                            {
+                                // chest_collider という名前が付いたコライダーのみ削除
+                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
+                                {
+                                    var collider = physBone.colliders[i];
+                                    if (
+                                        collider != null
+                                        && (
+                                            collider.name.Contains("upperleg_L_collider")
+                                            || collider.name.Contains("upperleg_R_collider")
+                                        )
+                                    )
+                                    {
+                                        physBone.colliders.RemoveAt(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    {
+                        if (
+                            descriptor.transform.Find(
+                                "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
+                            )
+                        )
+                        {
+                            var physBone = descriptor
+                                .transform.Find(
+                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
+                                )
+                                .GetComponent<VRCPhysBoneBase>();
+                            if (physBone != null && physBone.colliders != null)
+                            {
+                                // chest_collider という名前が付いたコライダーのみ削除
+                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
+                                {
+                                    var collider = physBone.colliders[i];
+                                    if (
+                                        collider != null
+                                        && (
+                                            collider.name.Contains("upperleg_L_collider")
+                                            || collider.name.Contains("upperleg_R_collider")
+                                        )
+                                    )
+                                    {
+                                        physBone.colliders.RemoveAt(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (upperleg_collider2)
+                {
+                    {
+                        if (descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L"))
+                        {
+                            var physBone = descriptor
+                                .transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L")
+                                .GetComponent<VRCPhysBoneBase>();
+                            if (physBone != null && physBone.colliders != null)
+                            {
+                                // chest_collider という名前が付いたコライダーのみ削除
+                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
+                                {
+                                    var collider = physBone.colliders[i];
+                                    if (
+                                        collider != null
+                                        && (
+                                            collider.name.Contains("upperleg_L_collider")
+                                            || collider.name.Contains("upperleg_R_collider")
+                                        )
+                                    )
+                                    {
+                                        physBone.colliders.RemoveAt(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    {
+                        if (descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R"))
+                        {
+                            var physBone = descriptor
+                                .transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R")
+                                .GetComponent<VRCPhysBoneBase>();
+                            if (physBone != null && physBone.colliders != null)
+                            {
+                                // chest_collider という名前が付いたコライダーのみ削除
+                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
+                                {
+                                    var collider = physBone.colliders[i];
+                                    if (
+                                        collider != null
+                                        && (
+                                            collider.name.Contains("upperleg_L_collider")
+                                            || collider.name.Contains("upperleg_R_collider")
+                                        )
+                                    )
+                                    {
+                                        physBone.colliders.RemoveAt(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (upperleg_collider3)
+                {
+                    {
+                        if (descriptor.transform.Find("Armature/Hips/tail/tail.044"))
+                        {
+                            var physBone = descriptor
+                                .transform.Find("Armature/Hips/tail/tail.044")
+                                .GetComponent<VRCPhysBoneBase>();
+                            if (physBone != null && physBone.colliders != null)
+                            {
+                                // chest_collider という名前が付いたコライダーのみ削除
+                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
+                                {
+                                    var collider = physBone.colliders[i];
+                                    if (
+                                        collider != null
+                                        && (
+                                            collider.name.Contains("upperleg_L_collider")
+                                            || collider.name.Contains("upperleg_R_collider")
+                                        )
+                                    )
+                                    {
+                                        physBone.colliders.RemoveAt(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (upperleg_collider1 && upperleg_collider2 && upperleg_collider3)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
+                        descriptor.transform.Find("Armature/Hips/Upperleg_L/upperleg_L_collider")
+                    );
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
+                        descriptor.transform.Find("Armature/Hips/Upperleg_R/upperleg_R_collider")
+                    );
+                }
+                if (upperArm_collider)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Shoulder_L/Upperarm_L/upperArm_L_collider"
+                        )
+                    );
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Shoulder_R/Upperarm_R/upperArm_R_collider"
+                        )
+                    );
+                }
+                if (plane_collider)
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
+                        descriptor.transform.Find("Armature/plane_collider")
+                    );
+                if (head_collider1)
+                {
+                    {
+                        if (
+                            descriptor.transform.Find(
+                                "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
+                            )
+                        )
+                        {
+                            var physBone = descriptor
+                                .transform.Find(
+                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
+                                )
+                                .GetComponent<VRCPhysBoneBase>();
+                            if (physBone != null && physBone.colliders != null)
+                            {
+                                // chest_collider という名前が付いたコライダーのみ削除
+                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
+                                {
+                                    var collider = physBone.colliders[i];
+                                    if (collider != null && collider.name.Contains("head_collider"))
+                                    {
+                                        physBone.colliders.RemoveAt(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    {
+                        if (
+                            descriptor.transform.Find(
+                                "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
+                            )
+                        )
+                        {
+                            var physBone = descriptor
+                                .transform.Find(
+                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
+                                )
+                                .GetComponent<VRCPhysBoneBase>();
+                            if (physBone != null && physBone.colliders != null)
+                            {
+                                // chest_collider という名前が付いたコライダーのみ削除
+                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
+                                {
+                                    var collider = physBone.colliders[i];
+                                    if (collider != null && collider.name.Contains("head_collider"))
+                                    {
+                                        physBone.colliders.RemoveAt(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (head_collider2)
+                {
+                    {
+                        if (descriptor.transform.Find("Armature/Hips/tail/tail.044"))
+                        {
+                            var physBone = descriptor
+                                .transform.Find("Armature/Hips/tail/tail.044")
+                                .GetComponent<VRCPhysBoneBase>();
+                            if (physBone != null && physBone.colliders != null)
+                            {
+                                // chest_collider という名前が付いたコライダーのみ削除
+                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
+                                {
+                                    var collider = physBone.colliders[i];
+                                    if (collider != null && collider.name.Contains("head_collider"))
+                                    {
+                                        physBone.colliders.RemoveAt(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (head_collider1 && head_collider2)
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
+                        descriptor.transform.Find(
+                            "Armature/Hips/Spine/Chest/Neck/Head/head_collider"
+                        )
+                    );
+                if (Breast_collider)
+                {
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
+                        descriptor.transform.Find("Armature/Hips/Spine/Chest/Breast_R")
+                    );
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
+                        descriptor.transform.Find("Armature/Hips/Spine/Chest/Breast_L")
+                    );
+                }
+                if (plane_tail_collider)
+                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
+                        descriptor.transform.Find("Armature/plane_tail_collider")
+                    );
+            }
+
+            if (AAORemoveFlg)
+            {
+#if AVATAR_OPTIMIZER_FOUND
+                if (
+                    !descriptor
+                        .transform.Find("Body")
+                        .TryGetComponent<RemoveMeshByBlendShape>(out var removeMesh)
+                )
+                {
+                    removeMesh = descriptor
+                        .transform.Find("Body")
+                        .gameObject.AddComponent<RemoveMeshByBlendShape>();
+                    removeMesh.Initialize(1);
+                }
+                removeMesh.ShapeKeys.Add("照れ");
+#endif
+            }
+
             var assetGuids = AssetDatabase.FindAssets(
                 "t:VRCExpressionsMenu",
                 new[] { pathDir + "Menu" }
@@ -629,6 +1231,14 @@ namespace jp.illusive_isc.RuruneOptimizer
             Debug.Log("最適化を実行しました！");
         }
 
+        private static void DelPBByPathArray(VRCAvatarDescriptor descriptor, string[] paths)
+        {
+            foreach (var path in paths)
+            {
+                IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(descriptor.transform.Find(path));
+            }
+        }
+
         private static void MarkAllMenusDirty(VRCExpressionsMenu menu)
         {
             if (menu == null)
@@ -650,7 +1260,10 @@ namespace jp.illusive_isc.RuruneOptimizer
         /// </summary>
         public static VRCExpressionsMenu DuplicateExpressionMenu(
             VRCExpressionsMenu originalMenu,
-            string parentPath
+            string parentPath,
+            string iconPath,
+            bool questFlg1,
+            TextureResizeOption textureResize
         )
         {
             if (originalMenu == null)
@@ -676,10 +1289,53 @@ namespace jp.illusive_isc.RuruneOptimizer
                 return newMenu;
             }
             newMenu = Instantiate(originalMenu);
-            // サブメニューの複製
+            // サブメニューの複製とアイコンのディープコピー
             for (int i = 0; i < newMenu.controls.Count; i++)
             {
                 var control = newMenu.controls[i];
+                if (questFlg1)
+                {
+                    if (textureResize == TextureResizeOption.LowerResolution)
+                    {
+                        var originalControl = originalMenu.controls[i];
+
+                        // --- アイコンのディープコピー処理 ---
+                        if (originalControl.icon != null)
+                        {
+                            string iconAssetPath = AssetDatabase.GetAssetPath(originalControl.icon);
+                            if (!string.IsNullOrEmpty(iconAssetPath))
+                            {
+                                string iconFileName = Path.GetFileName(iconAssetPath);
+                                string destPath = Path.Combine(iconPath, iconFileName);
+                                // 既にコピー済みでなければコピー
+                                if (!File.Exists(destPath))
+                                {
+                                    File.Copy(iconAssetPath, destPath, true);
+                                    AssetDatabase.ImportAsset(destPath);
+                                }
+                                // コピーしたアイコンをロードしてcontrol.iconにセット
+                                var copiedIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(destPath);
+                                if (copiedIcon != null)
+                                {
+                                    // Max Sizeを変更
+                                    var importer =
+                                        AssetImporter.GetAtPath(destPath) as TextureImporter;
+                                    if (importer != null)
+                                    {
+                                        importer.maxTextureSize = 32;
+                                        importer.SaveAndReimport();
+                                    }
+                                    control.icon = copiedIcon;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        control.icon = null;
+                    }
+                }
+                // サブメニューの複製
                 if (control.subMenu != null)
                 {
                     string subMenuFolderPath = Path.Combine(menuFolderPath, control.subMenu.name);
@@ -687,9 +1343,16 @@ namespace jp.illusive_isc.RuruneOptimizer
                         AssetDatabase.LoadAssetAtPath<VRCExpressionsMenu>(
                             Path.Combine(subMenuFolderPath, control.subMenu.name + ".asset")
                         );
+
                     if (existingSubMenu == null)
                     {
-                        control.subMenu = DuplicateExpressionMenu(control.subMenu, menuFolderPath);
+                        control.subMenu = DuplicateExpressionMenu(
+                            control.subMenu,
+                            menuFolderPath,
+                            iconPath,
+                            questFlg1,
+                            textureResize
+                        );
                     }
                     else
                     {

@@ -1,6 +1,10 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using VRC.SDK3.Avatars.Components;
+#if AVATAR_OPTIMIZER_FOUND
+using Anatawa12.AvatarOptimizer;
+#endif
 
 namespace jp.illusive_isc.RuruneOptimizer
 {
@@ -62,6 +66,100 @@ namespace jp.illusive_isc.RuruneOptimizer
         SerializedProperty HairFlg50;
         SerializedProperty HairFlg51;
         SerializedProperty HairFlg60;
+        SerializedProperty questFlg1;
+
+        SerializedProperty Skirt_Root;
+        SerializedProperty Breast;
+        SerializedProperty backhair;
+        SerializedProperty back_side_root;
+        SerializedProperty Head_002;
+        SerializedProperty Front_hair2_root;
+        SerializedProperty side_1_root;
+        SerializedProperty hair_2;
+        SerializedProperty sidehair;
+        SerializedProperty side_3_root;
+        SerializedProperty Side_root;
+        SerializedProperty tail_044;
+        SerializedProperty tail_022;
+
+        SerializedProperty chest_collider1;
+        SerializedProperty chest_collider2;
+        SerializedProperty upperleg_collider1;
+        SerializedProperty upperleg_collider2;
+        SerializedProperty upperleg_collider3;
+        SerializedProperty upperArm_collider;
+        SerializedProperty plane_collider;
+        SerializedProperty head_collider1;
+        SerializedProperty head_collider2;
+        SerializedProperty Breast_collider;
+        SerializedProperty plane_tail_collider;
+        SerializedProperty textureResize;
+        SerializedProperty AAORemoveFlg;
+        bool questArea;
+
+        // PB情報とコライダー情報のクラス定義（namespace内、Editorクラス外に移動）
+        public class PhysBoneInfo
+        {
+            public int AffectedCount; //:Transform数
+            public int Count; //:Transform数
+            public int ColliderCount; //:Collider数
+        }
+
+        public static readonly Dictionary<string, PhysBoneInfo> physBoneList = new()
+        {
+            {
+                "Breast",
+                new PhysBoneInfo { AffectedCount = 6, ColliderCount = 0 }
+            },
+            {
+                "back_side_root",
+                new PhysBoneInfo { AffectedCount = 9, ColliderCount = 0 }
+            },
+            {
+                "Head_002",
+                new PhysBoneInfo { AffectedCount = 4, ColliderCount = 0 }
+            },
+            {
+                "Front_hair2_root",
+                new PhysBoneInfo { AffectedCount = 10, ColliderCount = 0 }
+            },
+            {
+                "side_1_root",
+                new PhysBoneInfo { AffectedCount = 15, ColliderCount = 0 }
+            },
+            {
+                "hair_2",
+                new PhysBoneInfo { AffectedCount = 10, ColliderCount = 0 }
+            },
+            {
+                "sidehair",
+                new PhysBoneInfo { AffectedCount = 6, ColliderCount = 0 }
+            },
+            {
+                "side_3_root",
+                new PhysBoneInfo { AffectedCount = 37, ColliderCount = 0 }
+            },
+            {
+                "tail_022",
+                new PhysBoneInfo { AffectedCount = 10, ColliderCount = 0 }
+            },
+            {
+                "tail_044",
+                new PhysBoneInfo { AffectedCount = 18, ColliderCount = 13 }
+            },
+            {
+                "Side_root",
+                new PhysBoneInfo { AffectedCount = 13, ColliderCount = 20 }
+            },
+            {
+                "backhair",
+                new PhysBoneInfo { AffectedCount = 20, ColliderCount = 18 }
+            },
+            {
+                "Skirt_Root",
+                new PhysBoneInfo { AffectedCount = 42, ColliderCount = 60 }
+            },
+        };
 
         private void OnEnable()
         {
@@ -120,12 +218,42 @@ namespace jp.illusive_isc.RuruneOptimizer
             HairFlg50 = serializedObject.FindProperty("HairFlg5");
             HairFlg51 = serializedObject.FindProperty("HairFlg51");
             HairFlg60 = serializedObject.FindProperty("HairFlg6");
+            questFlg1 = serializedObject.FindProperty("questFlg1");
+
+            Skirt_Root = serializedObject.FindProperty("Skirt_Root");
+            Breast = serializedObject.FindProperty("Breast");
+            backhair = serializedObject.FindProperty("backhair");
+            back_side_root = serializedObject.FindProperty("back_side_root");
+            Head_002 = serializedObject.FindProperty("Head_002");
+            Front_hair2_root = serializedObject.FindProperty("Front_hair2_root");
+            side_1_root = serializedObject.FindProperty("side_1_root");
+            hair_2 = serializedObject.FindProperty("hair_2");
+            sidehair = serializedObject.FindProperty("sidehair");
+            side_3_root = serializedObject.FindProperty("side_3_root");
+            Side_root = serializedObject.FindProperty("Side_root");
+            tail_044 = serializedObject.FindProperty("tail_044");
+            tail_022 = serializedObject.FindProperty("tail_022");
+            chest_collider1 = serializedObject.FindProperty("chest_collider1");
+            chest_collider2 = serializedObject.FindProperty("chest_collider2");
+            upperleg_collider1 = serializedObject.FindProperty("upperleg_collider1");
+            upperleg_collider2 = serializedObject.FindProperty("upperleg_collider2");
+            upperleg_collider3 = serializedObject.FindProperty("upperleg_collider3");
+            upperArm_collider = serializedObject.FindProperty("upperArm_collider");
+            plane_collider = serializedObject.FindProperty("plane_collider");
+            head_collider1 = serializedObject.FindProperty("head_collider1");
+            head_collider2 = serializedObject.FindProperty("head_collider2");
+            Breast_collider = serializedObject.FindProperty("Breast_collider");
+            plane_tail_collider = serializedObject.FindProperty("plane_tail_collider");
+            textureResize = serializedObject.FindProperty("textureResize");
+            AAORemoveFlg = serializedObject.FindProperty("AAORemoveFlg");
         }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
 
+            GUILayout.BeginHorizontal();
+            GUILayout.BeginVertical();
             EditorGUILayout.PropertyField(heelFlg1, new GUIContent("ヒールON"));
             EditorGUILayout.PropertyField(heelFlg2, new GUIContent("ハイヒールON"));
 
@@ -236,6 +364,8 @@ namespace jp.illusive_isc.RuruneOptimizer
                 GUI.enabled = true;
             EditorGUILayout.PropertyField(HairFlg40, new GUIContent("      └ hair2削除"));
             GUI.enabled = true;
+            GUILayout.EndVertical();
+            GUILayout.BeginVertical();
             EditorGUILayout.PropertyField(TailFlg, new GUIContent("尻尾削除"));
             EditorGUILayout.PropertyField(TailFlg1, new GUIContent("  └ リボン削除"));
             if (TailFlg.boolValue)
@@ -283,6 +413,360 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             EditorGUILayout.PropertyField(IKUSIA_emote1, new GUIContent("  └ 手動のAFKは残す"));
             GUI.enabled = true;
+
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+            questArea = EditorGUILayout.Foldout(questArea, "Quest用調整項目(素体のみ)", true);
+            if (questArea)
+            {
+                var ruruneOptimizer = (IllRuruneOptimizer)target;
+#if AVATAR_OPTIMIZER_FOUND
+                if (ruruneOptimizer.transform.root.GetComponent<TraceAndOptimize>() == null)
+                    EditorGUILayout.HelpBox(
+                        "アバターにTraceAndOptimizeを追加してください",
+                        MessageType.Error
+                    );
+#else
+                EditorGUILayout.HelpBox(
+                    "AvatarOptimizerが見つかりませんVCCに追加して有効化してください",
+                    MessageType.Error
+                );
+#endif
+                EditorGUILayout.HelpBox(
+                    "Quest化に対応してないコンポーネントやシェーダーを使っているためペット、TPS、透視、コライダー・ジャンプ、撮影ギミック、ライトガン、ホワイトブレス、バブルブレス、ウォータースタンプ、8bit、ペン操作、ハートガン、ヘッドホンのparticle、AFKの演出の一部を削除します。\n"
+                        + "",
+                    MessageType.Info
+                );
+                EditorGUILayout.PropertyField(questFlg1, new GUIContent("quest用にギミックを削除"));
+
+                if (questFlg1.boolValue)
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
+                    petFlg.boolValue = true;
+                    TPSFlg.boolValue = true;
+                    ClairvoyanceFlg.boolValue = true;
+                    colliderJumpFlg.boolValue = true;
+                    pictureFlg.boolValue = true;
+                    LightGunFlg.boolValue = true;
+                    WhiteBreathFlg.boolValue = true;
+                    BubbleBreathFlg.boolValue = true;
+                    WaterStampFlg.boolValue = true;
+                    eightBitFlg.boolValue = true;
+                    PenCtrlFlg.boolValue = true;
+                    HeartGunFlg.boolValue = true;
+                    HairFlg51.boolValue = true;
+                    serializedObject.ApplyModifiedProperties();
+                }
+                if (GUILayout.Button("おすすめ設定にする"))
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
+                    Head_002.boolValue = false;
+                    Front_hair2_root.boolValue = true;
+                    side_3_root.boolValue = true;
+                    Side_root.boolValue = false;
+                    Breast_collider.boolValue = true;
+                    backhair.boolValue = false;
+                    plane_collider.boolValue = true;
+                    head_collider1.boolValue = false;
+                    upperArm_collider.boolValue = true;
+                    upperleg_collider1.boolValue = true;
+                    chest_collider1.boolValue = true;
+                    hair_2.boolValue = true;
+                    Breast.boolValue = false;
+                    side_1_root.boolValue = true;
+                    sidehair.boolValue = true;
+                    back_side_root.boolValue = true;
+                    Skirt_Root.boolValue = true;
+                    upperleg_collider2.boolValue = true;
+                    tail_044.boolValue = false;
+                    head_collider2.boolValue = true;
+                    chest_collider2.boolValue = false;
+                    upperleg_collider3.boolValue = false;
+                    plane_tail_collider.boolValue = true;
+
+                    tail_022.boolValue = true;
+
+                    serializedObject.ApplyModifiedProperties();
+                }
+
+                if (questFlg1.boolValue)
+                {
+                    if (HairFlg.boolValue)
+                    {
+                        Head_002.boolValue = true;
+                        Front_hair2_root.boolValue = true;
+                        side_3_root.boolValue = true;
+                        Side_root.boolValue = true;
+                        backhair.boolValue = true;
+                        side_1_root.boolValue = true;
+                        sidehair.boolValue = true;
+                        back_side_root.boolValue = true;
+                    }
+                    if (HairFlg40.boolValue)
+                        hair_2.boolValue = true;
+                    if (ClothFlg2.boolValue)
+                        Skirt_Root.boolValue = true;
+
+                    if (TailFlg.boolValue)
+                        tail_044.boolValue = true;
+                    if (TailFlg1.boolValue)
+                        tail_022.boolValue = true;
+                }
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                GUILayout.BeginVertical();
+                EditorGUILayout.PropertyField(
+                    Head_002,
+                    new GUIContent("前髪:Transform: " + physBoneList["Head_002"].AffectedCount)
+                );
+                EditorGUILayout.PropertyField(
+                    Front_hair2_root,
+                    new GUIContent(
+                        "ぱっつん前髪:Transform : " + physBoneList["Front_hair2_root"].AffectedCount
+                    )
+                );
+                {
+                    if (!HairFlg60.boolValue)
+                        if (Head_002.boolValue != ruruneOptimizer.Head_002)
+                            Front_hair2_root.boolValue = false;
+                        else if (Front_hair2_root.boolValue != ruruneOptimizer.Front_hair2_root)
+                            Head_002.boolValue = false;
+                }
+
+                EditorGUILayout.PropertyField(
+                    side_3_root,
+                    new GUIContent(
+                        "前髪サイド:Transform : " + physBoneList["side_3_root"].AffectedCount
+                    )
+                );
+                EditorGUILayout.PropertyField(
+                    Side_root,
+                    new GUIContent("サイド:Transform : " + physBoneList["Side_root"].AffectedCount)
+                );
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                GUILayout.BeginVertical();
+                EditorGUILayout.PropertyField(
+                    Breast_collider,
+                    new GUIContent("胸部干渉 : " + physBoneList["Side_root"].ColliderCount)
+                );
+                if (Side_root.boolValue)
+                    Breast_collider.boolValue = true;
+                GUILayout.EndVertical();
+                GUILayout.EndHorizontal();
+                EditorGUILayout.PropertyField(
+                    backhair,
+                    new GUIContent("後ろ髪:Transform : " + physBoneList["backhair"].AffectedCount)
+                );
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                GUILayout.BeginVertical();
+                EditorGUILayout.PropertyField(
+                    plane_collider,
+                    new GUIContent("髪の地面干渉 : " + physBoneList["backhair"].ColliderCount)
+                );
+                EditorGUILayout.PropertyField(
+                    head_collider1,
+                    new GUIContent("頭部干渉 : " + physBoneList["backhair"].ColliderCount)
+                );
+                EditorGUILayout.PropertyField(
+                    upperArm_collider,
+                    new GUIContent("腕干渉 : " + physBoneList["backhair"].ColliderCount * 2)
+                );
+                EditorGUILayout.PropertyField(
+                    upperleg_collider1,
+                    new GUIContent("脚干渉 : " + physBoneList["backhair"].ColliderCount * 2)
+                );
+                EditorGUILayout.PropertyField(
+                    chest_collider1,
+                    new GUIContent("胸周り干渉 : " + physBoneList["backhair"].ColliderCount)
+                );
+                if (backhair.boolValue)
+                {
+                    plane_collider.boolValue = true;
+                    head_collider1.boolValue = true;
+                    upperArm_collider.boolValue = true;
+                    upperleg_collider1.boolValue = true;
+                    chest_collider1.boolValue = true;
+                }
+                GUILayout.EndVertical();
+                GUILayout.EndHorizontal();
+                EditorGUILayout.PropertyField(
+                    hair_2,
+                    new GUIContent("hair_2:Transform : " + physBoneList["hair_2"].AffectedCount)
+                );
+                EditorGUILayout.PropertyField(
+                    Breast,
+                    new GUIContent("胸:Transform : " + physBoneList["Breast"].AffectedCount)
+                );
+
+                EditorGUILayout.PropertyField(
+                    side_1_root,
+                    new GUIContent(
+                        "前髪小:Transform : " + physBoneList["side_1_root"].AffectedCount
+                    )
+                );
+                EditorGUILayout.PropertyField(
+                    sidehair,
+                    new GUIContent("横髪小:Transform : " + physBoneList["sidehair"].AffectedCount)
+                );
+                EditorGUILayout.PropertyField(
+                    back_side_root,
+                    new GUIContent(
+                        "後ろ髪小:Transform : " + physBoneList["back_side_root"].AffectedCount
+                    )
+                );
+
+                EditorGUILayout.PropertyField(
+                    Skirt_Root,
+                    new GUIContent(
+                        "スカート:Transform : " + physBoneList["Skirt_Root"].AffectedCount
+                    )
+                );
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                GUILayout.BeginVertical();
+                EditorGUILayout.PropertyField(
+                    upperleg_collider2,
+                    new GUIContent("脚干渉 : " + physBoneList["Skirt_Root"].ColliderCount)
+                );
+                if (Skirt_Root.boolValue)
+                {
+                    upperleg_collider2.boolValue = true;
+                }
+                GUILayout.EndVertical();
+                GUILayout.EndHorizontal();
+                EditorGUILayout.PropertyField(
+                    tail_044,
+                    new GUIContent("尻尾:Transform : " + physBoneList["tail_044"].AffectedCount)
+                );
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(30);
+                GUILayout.BeginVertical();
+                EditorGUILayout.PropertyField(
+                    head_collider2,
+                    new GUIContent("頭部干渉 : " + physBoneList["tail_044"].ColliderCount)
+                );
+                EditorGUILayout.PropertyField(
+                    chest_collider2,
+                    new GUIContent("胸周り干渉 : " + physBoneList["tail_044"].ColliderCount)
+                );
+                EditorGUILayout.PropertyField(
+                    upperleg_collider3,
+                    new GUIContent("脚干渉 : " + physBoneList["tail_044"].ColliderCount * 2)
+                );
+                EditorGUILayout.PropertyField(
+                    plane_tail_collider,
+                    new GUIContent("尻尾の地面干渉 : " + physBoneList["tail_044"].ColliderCount)
+                );
+                if (tail_044.boolValue)
+                {
+                    head_collider2.boolValue = true;
+                    chest_collider2.boolValue = true;
+                    upperleg_collider3.boolValue = true;
+                    plane_tail_collider.boolValue = true;
+                }
+                GUILayout.EndVertical();
+                GUILayout.EndHorizontal();
+                EditorGUILayout.PropertyField(
+                    tail_022,
+                    new GUIContent(
+                        "尻尾リボン:Transform : " + physBoneList["tail_022"].AffectedCount
+                    )
+                );
+                GUILayout.EndVertical();
+                GUILayout.EndHorizontal();
+                int count = 200;
+                if (Head_002.boolValue)
+                    count -= physBoneList["Head_002"].AffectedCount;
+                if (Front_hair2_root.boolValue)
+                    count -= physBoneList["Front_hair2_root"].AffectedCount;
+                if (side_1_root.boolValue)
+                    count -= physBoneList["side_1_root"].AffectedCount;
+                if (side_3_root.boolValue)
+                    count -= physBoneList["side_3_root"].AffectedCount;
+                if (Side_root.boolValue)
+                    count -= physBoneList["Side_root"].AffectedCount;
+                if (backhair.boolValue)
+                    count -= physBoneList["backhair"].AffectedCount;
+                if (back_side_root.boolValue)
+                    count -= physBoneList["back_side_root"].AffectedCount;
+                if (sidehair.boolValue)
+                    count -= physBoneList["sidehair"].AffectedCount;
+                if (hair_2.boolValue)
+                    count -= physBoneList["hair_2"].AffectedCount;
+                if (Breast.boolValue)
+                    count -= physBoneList["Breast"].AffectedCount;
+                if (Skirt_Root.boolValue)
+                    count -= physBoneList["Skirt_Root"].AffectedCount;
+                if (tail_044.boolValue)
+                    count -= physBoneList["tail_044"].AffectedCount;
+                if (tail_022.boolValue)
+                    count -= physBoneList["tail_022"].AffectedCount;
+                if (count > 64)
+                    EditorGUILayout.HelpBox(
+                        "影響transform数 :" + count + "/64 (64以下に調整してください)",
+                        MessageType.Error
+                    );
+                else
+                    EditorGUILayout.HelpBox("影響transform数 :" + count + "/64", MessageType.Info);
+
+                int count2 = 271;
+                if (Breast_collider.boolValue)
+                    count2 -= physBoneList["Side_root"].ColliderCount;
+
+                if (plane_collider.boolValue)
+                    count2 -= physBoneList["backhair"].ColliderCount;
+                if (head_collider1.boolValue)
+                    count2 -= physBoneList["Side_root"].ColliderCount;
+                if (upperArm_collider.boolValue)
+                    count2 -= physBoneList["backhair"].ColliderCount * 2;
+                if (upperleg_collider1.boolValue)
+                    count2 -= physBoneList["backhair"].ColliderCount * 2;
+                if (chest_collider1.boolValue)
+                    count2 -= physBoneList["Side_root"].ColliderCount;
+
+                if (chest_collider2.boolValue)
+                    count2 -= physBoneList["tail_044"].ColliderCount;
+                if (upperleg_collider3.boolValue)
+                    count2 -= physBoneList["tail_044"].ColliderCount * 2;
+                if (plane_tail_collider.boolValue)
+                    count2 -= physBoneList["tail_044"].ColliderCount;
+                if (head_collider2.boolValue)
+                    count2 -= physBoneList["tail_044"].ColliderCount;
+
+                if (upperleg_collider2.boolValue)
+                    count2 -= physBoneList["Skirt_Root"].ColliderCount;
+
+                if (count2 > 64)
+                    EditorGUILayout.HelpBox(
+                        "コライダー干渉数 :" + count2 + "/64 (64以下に調整してください)",
+                        MessageType.Error
+                    );
+                else
+                    EditorGUILayout.HelpBox(
+                        "コライダー干渉数 :" + count2 + "/64",
+                        MessageType.Info
+                    );
+                int selected = textureResize.enumValueIndex;
+                textureResize.enumValueIndex = EditorGUILayout.Popup(
+                    "メニュー画像解像度設定",
+                    selected,
+                    new[] { "下げる", "削除" }
+                );
+
+#if !AVATAR_OPTIMIZER_FOUND
+                GUI.enabled = false;
+                EditorGUILayout.HelpBox(
+                    "AAOがインストールされている場合のみ「頬染めを削除」が有効になります。",
+                    MessageType.Info
+                );
+#endif
+                EditorGUILayout.PropertyField(AAORemoveFlg, new GUIContent("頬染めを削除"));
+                GUI.enabled = true;
+            }
 
             // Execute ボタンの追加
             if (GUILayout.Button("Execute"))

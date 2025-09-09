@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using VRC.Dynamics;
 #if UNITY_EDITOR
 using UnityEditor.Animations;
 
@@ -79,6 +80,15 @@ namespace jp.illusive_isc.RuruneOptimizer
             if (obj)
             {
                 DestroyImmediate(obj);
+            }
+        }
+
+        public static void DestroyComponent<T>(Transform obj)
+            where T : Component
+        {
+            if (obj)
+            {
+                DestroyImmediate(obj.GetComponent<T>());
             }
         }
 
