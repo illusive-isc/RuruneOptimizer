@@ -7,10 +7,10 @@ using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDKBase;
+#if UNITY_EDITOR
 #if AVATAR_OPTIMIZER_FOUND
 using Anatawa12.AvatarOptimizer;
 #endif
-#if UNITY_EDITOR
 using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
@@ -1185,36 +1185,7 @@ namespace jp.illusive_isc.RuruneOptimizer
 #endif
             }
 
-            var assetGuids = AssetDatabase.FindAssets(
-                "t:VRCExpressionsMenu",
-                new[] { pathDir + "Menu" }
-            );
-
-            Dictionary<string, VRCExpressionsMenu> menus = new();
-            foreach (var guid in assetGuids)
-            {
-                menus.Add(
-                    guid,
-                    AssetDatabase.LoadAssetAtPath<VRCExpressionsMenu>(
-                        AssetDatabase.GUIDToAssetPath(guid)
-                    )
-                );
-            }
-            foreach (var menuItem in menus)
-            {
-                var delFlg = true;
-                if (menuItem.Value.controls.Any(p => p.parameter.name == ""))
-                    continue;
-                foreach (var control in menuItem.Value.controls)
-                    if (!string.IsNullOrEmpty(control.parameter.name))
-                        if (param.parameters.Any(p => p.name == control.parameter.name))
-                        {
-                            delFlg = false;
-                            break;
-                        }
-                if (delFlg)
-                    AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(menuItem.Key));
-            }
+            RemoveUnusedMenuControls(menu, param);
             // 新規に複製した AnimatorController をアセットとして保存
             EditorUtility.SetDirty(controller);
             MarkAllMenusDirty(menu);
@@ -1229,6 +1200,55 @@ namespace jp.illusive_isc.RuruneOptimizer
             EditorUtility.SetDirty(descriptor);
 
             Debug.Log("最適化を実行しました！");
+        }
+
+        /// <summary>
+        /// 使用されていないメニューコントロールを再帰的に削除
+        /// </summary>
+        private static void RemoveUnusedMenuControls(
+            VRCExpressionsMenu menu,
+            VRCExpressionParameters param
+        )
+        {
+            if (menu == null)
+                return;
+
+            // このメニューの不要なコントロールを削除
+            for (int i = menu.controls.Count - 1; i >= 0; i--)
+            {
+                var control = menu.controls[i];
+                bool shouldRemove = true;
+
+                // パラメータ名が空の場合はスキップ
+                if (string.IsNullOrEmpty(control.parameter.name))
+                {
+                    shouldRemove = false;
+                }
+                else
+                {
+                    // パラメータが存在するかチェック
+                    if (param.parameters.Any(p => p.name == control.parameter.name))
+                    {
+                        shouldRemove = false;
+                    }
+                }
+
+                // サブメニューがある場合は再帰的にチェック
+                if (control.subMenu != null)
+                {
+                    RemoveUnusedMenuControls(control.subMenu, param);
+                    // サブメニューに有効なコントロールがある場合は削除しない
+                    if (control.subMenu.controls.Count > 0)
+                    {
+                        shouldRemove = false;
+                    }
+                }
+
+                if (shouldRemove)
+                {
+                    menu.controls.RemoveAt(i);
+                }
+            }
         }
 
         private static void DelPBByPathArray(VRCAvatarDescriptor descriptor, string[] paths)
@@ -1266,29 +1286,71 @@ namespace jp.illusive_isc.RuruneOptimizer
             TextureResizeOption textureResize
         )
         {
+            return DuplicateExpressionMenu(
+                originalMenu,
+                parentPath,
+                iconPath,
+                questFlg1,
+                textureResize,
+                null,
+                null,
+                null
+            );
+        }
+
+        /// <summary>
+        /// Expression Menu の複製（サブメニューも再帰的に複製）
+        /// </summary>
+        private static VRCExpressionsMenu DuplicateExpressionMenu(
+            VRCExpressionsMenu originalMenu,
+            string parentPath,
+            string iconPath,
+            bool questFlg1,
+            TextureResizeOption textureResize,
+            VRCExpressionsMenu rootMenuAsset = null,
+            Dictionary<VRCExpressionsMenu, VRCExpressionsMenu> processedMenus = null,
+            Dictionary<string, Texture2D> processedIcons = null
+        )
+        {
             if (originalMenu == null)
             {
                 Debug.LogError("元のExpression Menuがありません");
                 return null;
             }
-            // このメニュー用のフォルダを作成
-            string menuFolderPath = Path.Combine(parentPath, originalMenu.name);
-            if (!Directory.Exists(menuFolderPath))
-            {
-                Directory.CreateDirectory(menuFolderPath);
-                AssetDatabase.Refresh();
-            }
-            // メニューの新規保存パス
-            string menuAssetPath = Path.Combine(menuFolderPath, originalMenu.name + ".asset");
 
-            VRCExpressionsMenu newMenu = AssetDatabase.LoadAssetAtPath<VRCExpressionsMenu>(
-                menuAssetPath
-            );
-            if (newMenu != null)
+            // 最初の呼び出しの場合、processedMenusを初期化
+            bool isRootCall = processedMenus == null;
+            if (isRootCall)
             {
-                return newMenu;
+                processedMenus = new Dictionary<VRCExpressionsMenu, VRCExpressionsMenu>();
+                processedIcons = new Dictionary<string, Texture2D>();
             }
-            newMenu = Instantiate(originalMenu);
+
+            // 既に処理済みのメニューの場合、キャッシュされたものを返す
+            if (processedMenus.ContainsKey(originalMenu))
+            {
+                return processedMenus[originalMenu];
+            }
+
+            VRCExpressionsMenu newMenu = Instantiate(originalMenu);
+            newMenu.name = originalMenu.name;
+
+            // 処理済みリストに追加（循環参照を防ぐため、早めに追加）
+            processedMenus[originalMenu] = newMenu;
+
+            if (isRootCall)
+            {
+                // ルートメニューの場合は、CreateAssetで作成
+                string menuAssetPath = Path.Combine(parentPath, originalMenu.name + ".asset");
+                AssetDatabase.CreateAsset(newMenu, menuAssetPath);
+                rootMenuAsset = newMenu;
+            }
+            else if (rootMenuAsset != null)
+            {
+                // サブメニューの場合は、rootMenuAssetの子としてAddObjectToAssetで配置
+                AssetDatabase.AddObjectToAsset(newMenu, rootMenuAsset);
+            }
+
             // サブメニューの複製とアイコンのディープコピー
             for (int i = 0; i < newMenu.controls.Count; i++)
             {
@@ -1307,25 +1369,41 @@ namespace jp.illusive_isc.RuruneOptimizer
                             {
                                 string iconFileName = Path.GetFileName(iconAssetPath);
                                 string destPath = Path.Combine(iconPath, iconFileName);
-                                // 既にコピー済みでなければコピー
-                                if (!File.Exists(destPath))
+
+                                // 既に処理済みのアイコンかチェック
+                                if (processedIcons.ContainsKey(iconAssetPath))
                                 {
-                                    File.Copy(iconAssetPath, destPath, true);
-                                    AssetDatabase.ImportAsset(destPath);
+                                    // 既に処理済みの場合、キャッシュされたテクスチャを使用
+                                    control.icon = processedIcons[iconAssetPath];
                                 }
-                                // コピーしたアイコンをロードしてcontrol.iconにセット
-                                var copiedIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(destPath);
-                                if (copiedIcon != null)
+                                else
                                 {
-                                    // Max Sizeを変更
-                                    var importer =
-                                        AssetImporter.GetAtPath(destPath) as TextureImporter;
-                                    if (importer != null)
+                                    // 新しいアイコンの場合、コピーして処理
+                                    if (!File.Exists(destPath))
                                     {
-                                        importer.maxTextureSize = 32;
-                                        importer.SaveAndReimport();
+                                        File.Copy(iconAssetPath, destPath, true);
+                                        AssetDatabase.ImportAsset(destPath);
                                     }
-                                    control.icon = copiedIcon;
+
+                                    // コピーしたアイコンをロードして設定
+                                    var copiedIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(
+                                        destPath
+                                    );
+                                    if (copiedIcon != null)
+                                    {
+                                        // Max Sizeを変更
+                                        var importer =
+                                            AssetImporter.GetAtPath(destPath) as TextureImporter;
+                                        if (importer != null)
+                                        {
+                                            importer.maxTextureSize = 32;
+                                            importer.SaveAndReimport();
+                                        }
+
+                                        // キャッシュに保存
+                                        processedIcons[iconAssetPath] = copiedIcon;
+                                        control.icon = copiedIcon;
+                                    }
                                 }
                             }
                         }
@@ -1338,30 +1416,23 @@ namespace jp.illusive_isc.RuruneOptimizer
                 // サブメニューの複製
                 if (control.subMenu != null)
                 {
-                    string subMenuFolderPath = Path.Combine(menuFolderPath, control.subMenu.name);
-                    VRCExpressionsMenu existingSubMenu =
-                        AssetDatabase.LoadAssetAtPath<VRCExpressionsMenu>(
-                            Path.Combine(subMenuFolderPath, control.subMenu.name + ".asset")
-                        );
-
-                    if (existingSubMenu == null)
-                    {
-                        control.subMenu = DuplicateExpressionMenu(
-                            control.subMenu,
-                            menuFolderPath,
-                            iconPath,
-                            questFlg1,
-                            textureResize
-                        );
-                    }
-                    else
-                    {
-                        control.subMenu = existingSubMenu;
-                    }
+                    control.subMenu = DuplicateExpressionMenu(
+                        control.subMenu,
+                        parentPath,
+                        iconPath,
+                        questFlg1,
+                        textureResize,
+                        rootMenuAsset,
+                        processedMenus,
+                        processedIcons
+                    );
                 }
             }
             EditorUtility.SetDirty(newMenu);
-            AssetDatabase.CreateAsset(newMenu, menuAssetPath);
+            if (isRootCall)
+            {
+                AssetDatabase.SaveAssets();
+            }
             return newMenu;
         }
     }

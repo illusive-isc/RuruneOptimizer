@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -90,6 +91,29 @@ namespace jp.illusive_isc.RuruneOptimizer
                         if (state.state.name == "New State" || state.state.name == "New State 0")
                         {
                             layer.stateMachine.RemoveState(state.state);
+                            continue;
+                        }
+                        if (state.state.name == "butterfly_off")
+                        {
+                            foreach (var transition in state.state.transitions)
+                            {
+                                foreach (var condition in transition.conditions)
+                                {
+                                    if (condition.parameter == "VRMode")
+                                    {
+                                        transition.conditions = new AnimatorCondition[]
+                                        {
+                                            new()
+                                            {
+                                                mode = AnimatorConditionMode.Greater,
+                                                parameter = "VRMode",
+                                                threshold = 0.5f,
+                                            },
+                                        };
+                                        break;
+                                    }
+                                }
+                            }
                             continue;
                         }
                     }
