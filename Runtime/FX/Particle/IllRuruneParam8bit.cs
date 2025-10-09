@@ -81,7 +81,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParam8bit DestroyObj()
+        public IllRuruneParam8bit ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("Advanced/Particle/5"));
             return this;

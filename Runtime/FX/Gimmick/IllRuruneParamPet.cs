@@ -183,7 +183,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamPet DestroyObj()
+        public IllRuruneParamPet ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("Advanced/Pet model"));
             DestroyObj(descriptor.transform.Find("Advanced/Pet_Player_Position"));

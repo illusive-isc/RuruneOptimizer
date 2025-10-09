@@ -14,7 +14,7 @@ namespace jp.illusive_isc.RuruneOptimizer
         HashSet<string> paramList = new();
         VRCAvatarDescriptor descriptor;
         AnimatorController animator;
-
+        bool HeartGunFlg;
         private static readonly List<string> Layers = new() { "PenCtrl_R", "PenCtrl_L" };
 
         private static readonly List<string> MenuParameters = new()
@@ -28,15 +28,17 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamPenCtrl Initialize(
             VRCAvatarDescriptor descriptor,
-            AnimatorController animator
+            AnimatorController animator,
+            IllRuruneOptimizer optimizer
         )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            this.HeartGunFlg = optimizer.HeartGunFlg;
             return this;
         }
 
-        public IllRuruneParamPenCtrl DeleteFx(bool HeartGunFlg)
+        public IllRuruneParamPenCtrl DeleteFx()
         {
             if (!HeartGunFlg)
             {
@@ -172,7 +174,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamPenCtrl DestroyObj()
+        public IllRuruneParamPenCtrl ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("Advanced/Particle/7"));
             DestroyObj(descriptor.transform.Find("Advanced/Constraint/Index_R_Constraint"));

@@ -14,15 +14,23 @@ namespace jp.illusive_isc.RuruneOptimizer
         VRCAvatarDescriptor descriptor;
         AnimatorController animator;
 
+        bool breastSizeFlg1,
+            breastSizeFlg2,
+            breastSizeFlg3;
+
         private static readonly List<string> MenuParameters = new() { "BreastSize" };
 
         public IllRuruneParamBreastSize Initialize(
             VRCAvatarDescriptor descriptor,
-            AnimatorController animator
+            AnimatorController animator,
+            IllRuruneOptimizer optimizer
         )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            breastSizeFlg1 = optimizer.BreastSizeFlg1;
+            breastSizeFlg2 = optimizer.BreastSizeFlg2;
+            breastSizeFlg3 = optimizer.BreastSizeFlg3;
             return this;
         }
 
@@ -81,11 +89,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamBreastSize DestroyObj(
-            bool breastSizeFlg1,
-            bool breastSizeFlg2,
-            bool breastSizeFlg3
-        )
+        public IllRuruneParamBreastSize DestroyObj()
         {
             var Body_b = descriptor.transform.Find("Body_b");
             if (Body_b)

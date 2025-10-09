@@ -145,7 +145,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamCollider DestroyObj()
+        public IllRuruneParamCollider ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("Advanced/Gimmick1"));
             return this;

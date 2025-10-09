@@ -87,7 +87,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamWaterStamp DestroyObj()
+        public IllRuruneParamWaterStamp ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("Advanced/Particle/2"));
             return this;

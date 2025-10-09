@@ -380,7 +380,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamDef DestroyObj()
+        public IllRuruneParamDef ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("Advanced/Object"));
             DestroyObj(descriptor.transform.Find("Advanced/FaceEffect"));

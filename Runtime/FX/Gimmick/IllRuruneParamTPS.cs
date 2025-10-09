@@ -81,7 +81,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamTPS DestroyObj()
+        public IllRuruneParamTPS ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("Advanced/TPS"));
             return this;

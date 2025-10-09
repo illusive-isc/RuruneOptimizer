@@ -1,16 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDKBase;
+using Debug = UnityEngine.Debug;
 #if UNITY_EDITOR
-#if AVATAR_OPTIMIZER_FOUND
-using Anatawa12.AvatarOptimizer;
-#endif
 using UnityEditor.Animations;
 
 namespace jp.illusive_isc.RuruneOptimizer
@@ -18,7 +17,6 @@ namespace jp.illusive_isc.RuruneOptimizer
     [AddComponentMenu("RuruneOptimizer")]
     public class IllRuruneOptimizer : MonoBehaviour, IEditorOnly
     {
-        // 保存先のパス設定
         string pathDirPrefix = "Assets/RuruneOptimizer/";
         string pathDirSuffix = "/FX/";
         string pathName = "paryi_FX.controller";
@@ -26,72 +24,53 @@ namespace jp.illusive_isc.RuruneOptimizer
         [SerializeField]
         private bool petFlg = false;
 
-        [SerializeField]
-        private bool heelFlg1 = true;
+        public bool heelFlg1 = true;
 
-        [SerializeField]
-        private bool heelFlg2 = false;
+        public bool heelFlg2 = false;
 
         [SerializeField]
         private bool ClothFlg = false;
 
-        [SerializeField]
-        private bool ClothFlg1 = false;
+        public bool ClothFlg1 = false;
 
-        [SerializeField]
-        private bool ClothFlg2 = true;
+        public bool ClothFlg2 = true;
 
-        [SerializeField]
-        private bool ClothFlg3 = false;
+        public bool ClothFlg3 = false;
 
-        [SerializeField]
-        private bool ClothFlg4 = false;
+        public bool ClothFlg4 = false;
 
-        [SerializeField]
-        private bool ClothFlg5 = false;
+        public bool ClothFlg5 = false;
 
-        [SerializeField]
-        private bool ClothFlg6 = false;
+        public bool ClothFlg6 = false;
 
-        [SerializeField]
-        private bool ClothFlg7 = false;
+        public bool ClothFlg7 = false;
 
-        [SerializeField]
-        private bool ClothFlg8 = false;
+        public bool ClothFlg8 = false;
 
         [SerializeField]
         private bool HairFlg = false;
 
         public bool HairFlg1 = false;
 
-        [SerializeField]
-        private bool HairFlg11 = false;
+        public bool HairFlg11 = false;
 
-        [SerializeField]
-        private bool HairFlg12 = false;
+        public bool HairFlg12 = false;
 
         public bool HairFlg2 = false;
 
-        [SerializeField]
-        private bool HairFlg22 = false;
+        public bool HairFlg22 = false;
 
-        [SerializeField]
-        private bool HairFlg3 = false;
+        public bool HairFlg3 = false;
 
-        [SerializeField]
-        private bool HairFlg4 = false;
+        public bool HairFlg4 = false;
 
-        [SerializeField]
-        private bool HairFlg5 = false;
+        public bool HairFlg5 = false;
 
-        [SerializeField]
-        private bool HairFlg51 = false;
+        public bool HairFlg51 = false;
 
-        [SerializeField]
-        private bool HairFlg6 = false;
+        public bool HairFlg6 = false;
 
-        [SerializeField]
-        private bool TailFlg = false;
+        public bool TailFlg = false;
 
         [SerializeField]
         private bool TailFlg1 = false;
@@ -132,26 +111,19 @@ namespace jp.illusive_isc.RuruneOptimizer
         [SerializeField]
         private bool PenCtrlFlg = false;
 
-        [SerializeField]
-        private bool HeartGunFlg = false;
+        public bool HeartGunFlg = false;
 
-        [SerializeField]
-        private bool FaceGestureFlg = false;
+        public bool FaceGestureFlg = false;
 
-        [SerializeField]
-        private bool FaceLockFlg = false;
+        public bool FaceLockFlg = false;
 
-        [SerializeField]
-        private bool FaceValFlg = false;
+        public bool FaceValFlg = false;
 
-        [SerializeField]
-        private bool kamitukiFlg = false;
+        public bool kamitukiFlg = false;
 
-        [SerializeField]
-        private bool nadeFlg = false;
+        public bool nadeFlg = false;
 
-        [SerializeField]
-        private bool blinkFlg = false;
+        public bool blinkFlg = false;
 
         [SerializeField]
         private bool IKUSIA_emote = false;
@@ -159,8 +131,7 @@ namespace jp.illusive_isc.RuruneOptimizer
         [SerializeField]
         private bool IKUSIA_emote1 = true;
 
-        [SerializeField]
-        private bool questFlg1 = false;
+        public bool questFlg1 = false;
 
         public bool Skirt_Root;
 
@@ -207,8 +178,7 @@ namespace jp.illusive_isc.RuruneOptimizer
         public bool plane_collider;
         public bool AAORemoveFlg;
 
-        [SerializeField]
-        bool plane_tail_collider;
+        public bool plane_tail_collider;
         public AnimatorController controllerDef;
         public VRCExpressionsMenu menuDef;
         public VRCExpressionParameters paramDef;
@@ -221,134 +191,223 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public enum TextureResizeOption
         {
-            LowerResolution, // 下げる
-            Delete, // 削除
+            LowerResolution,
+            Delete,
         }
 
-        // Inspector で選択する値
         public TextureResizeOption textureResize = TextureResizeOption.LowerResolution;
+
+        private static readonly Dictionary<Type, System.Reflection.MethodInfo[]> methodCache =
+            new();
+
+        private struct ParamProcessConfig
+        {
+            public Func<bool> condition;
+            public Action processAction;
+            public Action afterAction;
+        }
+
+        private void ProcessParam<T>(VRCAvatarDescriptor descriptor)
+            where T : ScriptableObject
+        {
+            var instance = ScriptableObject.CreateInstance<T>();
+            var type = typeof(T);
+
+            if (!methodCache.TryGetValue(type, out var methods))
+            {
+                methods = new[]
+                {
+                    type.GetMethod("Initialize"),
+                    type.GetMethod("DeleteFx"),
+                    type.GetMethod("DeleteFxBT"),
+                    type.GetMethod("DeleteParam"),
+                    type.GetMethod("DeleteVRCExpressions"),
+                    type.GetMethod("ParticleOptimize"),
+                    type.GetMethod("ChangeObj"),
+                };
+                methodCache[type] = methods;
+            }
+
+            var initializeMethod = methods[0];
+            var deleteFxMethod = methods[1];
+            var deleteFxBTMethod = methods[2];
+            var deleteParamMethod = methods[3];
+            var deleteVRCExpressionsMethod = methods[4];
+            var ParticleOptimizeMethod = methods[5];
+            var changeObjMethod = methods[6];
+
+            if (initializeMethod != null)
+            {
+                try
+                {
+                    int count = initializeMethod.GetParameters().Length;
+                    object result = initializeMethod.Invoke(
+                        instance,
+                        count == 3
+                            ? new object[] { descriptor, controller, this }
+                            : new object[] { descriptor, controller }
+                    );
+
+                    deleteFxMethod?.Invoke(result, null);
+                    deleteFxBTMethod?.Invoke(result, null);
+                    deleteParamMethod?.Invoke(result, null);
+                    deleteVRCExpressionsMethod?.Invoke(result, new object[] { menu, param });
+                    ParticleOptimizeMethod?.Invoke(result, null);
+                    changeObjMethod?.Invoke(result, null);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[ProcessParam] Error processing {type.Name}: {ex.Message}");
+                    Debug.LogError($"[ProcessParam] Stack trace: {ex.StackTrace}");
+                }
+            }
+        }
+
+        private ParamProcessConfig[] GetParamConfigs(VRCAvatarDescriptor descriptor)
+        {
+            return new ParamProcessConfig[]
+            {
+                new()
+                {
+                    condition = () => true,
+                    processAction = () => ProcessParam<IllRuruneParamDef>(descriptor),
+                },
+                new()
+                {
+                    condition = () => petFlg,
+                    processAction = () => ProcessParam<IllRuruneParamPet>(descriptor),
+                },
+                new()
+                {
+                    condition = () => TailFlg,
+                    processAction = () => ProcessParam<IllRuruneParamTail>(descriptor),
+                    afterAction = () =>
+                    {
+                        if (TailFlg1)
+                            IllRuruneParam.DestroyObj(descriptor.transform.Find("tail_ribbon"));
+                    },
+                },
+                new()
+                {
+                    condition = () => ClothFlg,
+                    processAction = () => ProcessParam<IllRuruneParamCloth>(descriptor),
+                },
+                new()
+                {
+                    condition = () => HairFlg,
+                    processAction = () => ProcessParam<IllRuruneParamHair>(descriptor),
+                    afterAction = () =>
+                    {
+                        if (descriptor.transform.Find("Advanced/Particle/4"))
+                            if (questFlg1)
+                            {
+                                IllRuruneParam.DestroyObj(
+                                    descriptor.transform.Find(
+                                        "Armature/Hips/Spine/Chest/Neck/Head/headphone_particle"
+                                    )
+                                );
+                                IllRuruneParam.DestroyObj(
+                                    descriptor.transform.Find("Advanced/Particle/4")
+                                );
+                            }
+                    },
+                },
+                new()
+                {
+                    condition = () => TPSFlg,
+                    processAction = () => ProcessParam<IllRuruneParamTPS>(descriptor),
+                },
+                new()
+                {
+                    condition = () => ClairvoyanceFlg,
+                    processAction = () => ProcessParam<IllRuruneParamClairvoyance>(descriptor),
+                },
+                new()
+                {
+                    condition = () => colliderJumpFlg,
+                    processAction = () => ProcessParam<IllRuruneParamCollider>(descriptor),
+                },
+                new()
+                {
+                    condition = () => pictureFlg,
+                    processAction = () => ProcessParam<IllRuruneParamPicture>(descriptor),
+                },
+                new()
+                {
+                    condition = () => BreastSizeFlg,
+                    processAction = () => ProcessParam<IllRuruneParamBreastSize>(descriptor),
+                },
+                new()
+                {
+                    condition = () => LightGunFlg,
+                    processAction = () => ProcessParam<IllRuruneParamLightGun>(descriptor),
+                },
+                new()
+                {
+                    condition = () => WhiteBreathFlg,
+                    processAction = () => ProcessParam<IllRuruneParamWhiteBreath>(descriptor),
+                },
+                new()
+                {
+                    condition = () => BubbleBreathFlg,
+                    processAction = () => ProcessParam<IllRuruneParamBubbleBreath>(descriptor),
+                },
+                new()
+                {
+                    condition = () => WaterStampFlg,
+                    processAction = () => ProcessParam<IllRuruneParamWaterStamp>(descriptor),
+                },
+                new()
+                {
+                    condition = () => eightBitFlg,
+                    processAction = () => ProcessParam<IllRuruneParam8bit>(descriptor),
+                },
+                new()
+                {
+                    condition = () => HeartGunFlg,
+                    processAction = () => ProcessParam<IllRuruneParamHeartGun>(descriptor),
+                },
+                new()
+                {
+                    condition = () => PenCtrlFlg,
+                    processAction = () => ProcessParam<IllRuruneParamPenCtrl>(descriptor),
+                },
+                new()
+                {
+                    condition = () => FaceGestureFlg || FaceLockFlg || FaceValFlg,
+                    processAction = () => ProcessParam<IllRuruneParamFaceGesture>(descriptor),
+                },
+                new()
+                {
+                    condition = () => kamitukiFlg || nadeFlg || blinkFlg,
+                    processAction = () => ProcessParam<IllRuruneParamFaceContact>(descriptor),
+                },
+            };
+        }
 
         public void Execute(VRCAvatarDescriptor descriptor)
         {
-            // 保存先ディレクトリの作成
-            pathDir = pathDirPrefix + descriptor.gameObject.name + pathDirSuffix;
-            if (AssetDatabase.LoadAssetAtPath<AnimatorController>(pathDir + pathName) != null)
+            var stopwatch = Stopwatch.StartNew();
+            var stepTimes = new Dictionary<string, long>
             {
-                AssetDatabase.DeleteAsset(pathDir + pathName);
-                AssetDatabase.DeleteAsset(pathDir + "Menu");
-                AssetDatabase.DeleteAsset(pathDir + "paryi_paraments.asset");
-            }
-            if (!Directory.Exists(pathDir))
-            {
-                Directory.CreateDirectory(pathDir);
-            }
+                ["InitializeAssets"] = InitializeAssets(descriptor),
+                ["editProcessing"] = Edit(descriptor),
+                ["FinalizeAssets"] = FinalizeAssets(descriptor)
+            };
+            stopwatch.Stop();
+            Debug.Log(
+                $"最適化を実行しました！総処理時間: {stopwatch.ElapsedMilliseconds}ms ({stopwatch.Elapsed.TotalSeconds:F2}秒)"
+            );
 
-            // 基本コントローラの参照取得（なければ baseAnimationLayers[4] から取得）
-            if (!controllerDef)
+            foreach (var kvp in stepTimes)
             {
-                if (!descriptor.baseAnimationLayers[4].animatorController)
-                    descriptor.baseAnimationLayers[4].animatorController =
-                        AssetDatabase.LoadAssetAtPath<AnimatorController>(
-                            AssetDatabase.GUIDToAssetPath("3eece7cfaddb2fe4fb361c09935d2231")
-                        );
-                controllerDef =
-                    descriptor.baseAnimationLayers[4].animatorController as AnimatorController;
+                Debug.Log($"[Performance] {kvp.Key}: {kvp.Value}ms");
             }
-            AssetDatabase.CopyAsset(AssetDatabase.GetAssetPath(controllerDef), pathDir + pathName);
+        }
 
-            controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(pathDir + pathName);
-
-            // ExpressionMenu の複製
-            if (!menuDef)
-            {
-                if (!descriptor.expressionsMenu)
-                    descriptor.expressionsMenu = AssetDatabase.LoadAssetAtPath<VRCExpressionsMenu>(
-                        AssetDatabase.GUIDToAssetPath("78032fce499b8cd4c9590b79ccdf3166")
-                    );
-                menuDef = descriptor.expressionsMenu;
-            }
-            Dictionary<string, string> menu1 = new();
-            var iconPath = pathDir + "/icon";
-            if (!Directory.Exists(iconPath))
-            {
-                Directory.CreateDirectory(iconPath);
-            }
-            menu = DuplicateExpressionMenu(menuDef, pathDir, iconPath, questFlg1, textureResize);
-
-            // ExpressionParameters の複製
-            if (!paramDef)
-            {
-                if (!descriptor.expressionParameters)
-                    descriptor.expressionParameters =
-                        AssetDatabase.LoadAssetAtPath<VRCExpressionParameters>(
-                            AssetDatabase.GUIDToAssetPath("ab33368960825474eb83487d302f6743")
-                        );
-                paramDef = descriptor.expressionParameters;
-                paramDef.name = descriptor.expressionParameters.name;
-            }
-            param = ScriptableObject.CreateInstance<VRCExpressionParameters>();
-            EditorUtility.CopySerialized(paramDef, param);
-            param.name = paramDef.name;
-            EditorUtility.SetDirty(param);
-            AssetDatabase.CreateAsset(param, pathDir + param.name + ".asset");
-            IllRuruneParamDef illRuruneParamDef =
-                ScriptableObject.CreateInstance<IllRuruneParamDef>();
-            illRuruneParamDef
-                .Initialize(descriptor, controller)
-                .DeleteFx()
-                .DeleteFxBT()
-                .DeleteParam()
-                .DeleteVRCExpressions(menu, param)
-                .ParticleOptimize()
-                .DestroyObj();
-
-            if (petFlg)
-            {
-                IllRuruneParamPet illRuruneParamPet =
-                    ScriptableObject.CreateInstance<IllRuruneParamPet>();
-                illRuruneParamPet
-                    .Initialize(descriptor, controller)
-                    .DeleteFx()
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-            if (TailFlg1)
-                IllRuruneParam.DestroyObj(descriptor.transform.Find("tail_ribbon"));
-            if (TailFlg)
-            {
-                IllRuruneParamTail illRuruneParamTail =
-                    ScriptableObject.CreateInstance<IllRuruneParamTail>();
-                illRuruneParamTail
-                    .Initialize(descriptor, controller)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DestroyObj(ClothFlg1, ClothFlg2);
-            }
-            if (ClothFlg)
-            {
-                IllRuruneParamCloth illRuruneParamCloth =
-                    ScriptableObject.CreateInstance<IllRuruneParamCloth>();
-                illRuruneParamCloth
-                    .Initialize(descriptor, controller)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObjAll(
-                        TailFlg,
-                        ClothFlg1,
-                        ClothFlg2,
-                        ClothFlg3,
-                        ClothFlg4,
-                        ClothFlg5,
-                        ClothFlg6,
-                        ClothFlg7,
-                        ClothFlg8,
-                        heelFlg1,
-                        heelFlg2
-                    );
-            }
+        private long Edit(VRCAvatarDescriptor descriptor)
+        {
+            var step2 = Stopwatch.StartNew();
             var body_b = descriptor.transform.Find("Body_b");
             if (body_b)
                 if (body_b.TryGetComponent<SkinnedMeshRenderer>(out var body_bSMR))
@@ -356,238 +415,13 @@ namespace jp.illusive_isc.RuruneOptimizer
                     body_bSMR.SetBlendShapeWeight(28, heelFlg1 || heelFlg2 ? 0 : 100);
                     body_bSMR.SetBlendShapeWeight(29, heelFlg2 ? 100 : 0);
                 }
-
-            if (HairFlg || questFlg1)
+            foreach (var config in GetParamConfigs(descriptor))
             {
-                IllRuruneParamHair illRuruneParamHair =
-                    ScriptableObject.CreateInstance<IllRuruneParamHair>();
-                illRuruneParamHair.Initialize(descriptor, controller);
-                if (HairFlg)
-                    illRuruneParamHair
-                        .DeleteFxBT()
-                        .DeleteParam()
-                        .DeleteVRCExpressions(menu, param)
-                        .DestroyObj(
-                            HairFlg1,
-                            HairFlg11,
-                            HairFlg12,
-                            HairFlg2,
-                            HairFlg22,
-                            HairFlg3,
-                            HairFlg4,
-                            HairFlg5,
-                            HairFlg51,
-                            HairFlg6,
-                            TailFlg
-                        );
-                if (questFlg1)
-                    illRuruneParamHair.DestroyObj4Quest(questFlg1);
-            }
-
-            if (TPSFlg)
-            {
-                IllRuruneParamTPS illRuruneParamTPS =
-                    ScriptableObject.CreateInstance<IllRuruneParamTPS>();
-                illRuruneParamTPS
-                    .Initialize(descriptor, controller)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-            if (ClairvoyanceFlg)
-            {
-                IllRuruneParamClairvoyance illRuruneParamClairvoyance =
-                    ScriptableObject.CreateInstance<IllRuruneParamClairvoyance>();
-                illRuruneParamClairvoyance
-                    .Initialize(descriptor, controller)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-            if (colliderJumpFlg)
-            {
-                IllRuruneParamCollider illRuruneParamCollider =
-                    ScriptableObject.CreateInstance<IllRuruneParamCollider>();
-                illRuruneParamCollider
-                    .Initialize(descriptor, controller)
-                    .DeleteFx()
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-            if (pictureFlg)
-            {
-                IllRuruneParamPicture illRuruneParamPicture =
-                    ScriptableObject.CreateInstance<IllRuruneParamPicture>();
-                illRuruneParamPicture
-                    .Initialize(descriptor, controller)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-            if (BreastSizeFlg)
-            {
-                IllRuruneParamBreastSize illRuruneParamBreastSize =
-                    ScriptableObject.CreateInstance<IllRuruneParamBreastSize>();
-                illRuruneParamBreastSize
-                    .Initialize(descriptor, controller)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj(BreastSizeFlg1, BreastSizeFlg2, BreastSizeFlg3);
-            }
-            if (LightGunFlg)
-            {
-                IllRuruneParamLightGun illRuruneParamLightGun =
-                    ScriptableObject.CreateInstance<IllRuruneParamLightGun>();
-                illRuruneParamLightGun
-                    .Initialize(descriptor, controller)
-                    .DeleteFx()
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-            if (WhiteBreathFlg)
-            {
-                IllRuruneParamWhiteBreath illRuruneParamWhiteBreath =
-                    ScriptableObject.CreateInstance<IllRuruneParamWhiteBreath>();
-                illRuruneParamWhiteBreath
-                    .Initialize(descriptor, controller)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-            if (BubbleBreathFlg)
-            {
-                IllRuruneParamBubbleBreath illRuruneParamBubbleBreath =
-                    ScriptableObject.CreateInstance<IllRuruneParamBubbleBreath>();
-                illRuruneParamBubbleBreath
-                    .Initialize(descriptor, controller)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-            if (WaterStampFlg)
-            {
-                IllRuruneParamWaterStamp illRuruneParamWaterStamp =
-                    ScriptableObject.CreateInstance<IllRuruneParamWaterStamp>();
-                illRuruneParamWaterStamp
-                    .Initialize(descriptor, controller)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-
-            if (eightBitFlg)
-            {
-                IllRuruneParam8bit illRuruneParam8bit =
-                    ScriptableObject.CreateInstance<IllRuruneParam8bit>();
-                illRuruneParam8bit
-                    .Initialize(descriptor, controller)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-            if (HeartGunFlg)
-            {
-                IllRuruneParamHeartGun illRuruneParamHeartGun =
-                    ScriptableObject.CreateInstance<IllRuruneParamHeartGun>();
-                illRuruneParamHeartGun
-                    .Initialize(descriptor, controller)
-                    .DeleteFx()
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-            if (PenCtrlFlg)
-            {
-                IllRuruneParamPenCtrl illRuruneParamPenCtrl =
-                    ScriptableObject.CreateInstance<IllRuruneParamPenCtrl>();
-                illRuruneParamPenCtrl
-                    .Initialize(descriptor, controller)
-                    .DeleteFx(HeartGunFlg)
-                    .DeleteFxBT()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param)
-                    .DestroyObj();
-            }
-
-            if (FaceGestureFlg || FaceLockFlg || FaceValFlg)
-            {
-                IllRuruneParamFaceGesture illRuruneParamFaceGesture =
-                    ScriptableObject.CreateInstance<IllRuruneParamFaceGesture>();
-                illRuruneParamFaceGesture
-                    .Initialize(descriptor, controller, FaceGestureFlg, FaceLockFlg, FaceValFlg)
-                    .DeleteFx()
-                    .DeleteParam()
-                    .DeleteVRCExpressions(menu, param);
-            }
-            if (kamitukiFlg || nadeFlg || blinkFlg)
-            {
-                IllRuruneParamFaceContact illRuruneParamFaceGesture =
-                    ScriptableObject.CreateInstance<IllRuruneParamFaceContact>();
-                illRuruneParamFaceGesture
-                    .Initialize(descriptor, controller, kamitukiFlg, nadeFlg, blinkFlg)
-                    .DeleteVRCExpressions(menu, param);
-            }
-            if (
-                (FaceGestureFlg || (FaceLockFlg && FaceValFlg))
-                && kamitukiFlg
-                && nadeFlg
-                && blinkFlg
-            )
-            {
-                foreach (var control in menu.controls)
+                if (config.condition())
                 {
-                    if (control.name == "Gimmick")
-                    {
-                        var expressionsSubMenu = control.subMenu;
-
-                        foreach (var control2 in expressionsSubMenu.controls)
-                        {
-                            if (control2.name == "Face")
-                            {
-                                expressionsSubMenu.controls.Remove(control2);
-                                break;
-                            }
-                        }
-                        control.subMenu = expressionsSubMenu;
-                        break;
-                    }
+                    config.processAction();
                 }
-            }
-
-            if (
-                LightGunFlg
-                && TPSFlg
-                && pictureFlg
-                && BreastSizeFlg
-                && ClairvoyanceFlg
-                && petFlg
-                && kamitukiFlg
-                && nadeFlg
-                && blinkFlg
-                && (FaceGestureFlg || (FaceLockFlg && FaceValFlg))
-            )
-            {
-                foreach (var control in menu.controls)
-                {
-                    if (control.name == "Gimmick")
-                    {
-                        menu.controls.Remove(control);
-                        break;
-                    }
-                }
+                config.afterAction?.Invoke();
             }
 
             if (IKUSIA_emote && IKUSIA_emote1)
@@ -622,589 +456,95 @@ namespace jp.illusive_isc.RuruneOptimizer
                         menu.controls.Remove(control);
                         break;
                     }
-            // （必要に応じて各種フラグに合わせた調整処理を実施）
-            if (ClothFlg && HairFlg)
-            {
-                foreach (var control in menu.controls)
-                {
-                    if (control.name == "closet")
-                    {
-                        menu.controls.Remove(control);
-                        break;
-                    }
-                }
-            }
-            if (
-                eightBitFlg
-                && BubbleBreathFlg
-                && HeartGunFlg
-                && PenCtrlFlg
-                && WaterStampFlg
-                && WhiteBreathFlg
-            )
-            {
-                foreach (var control in menu.controls)
-                {
-                    if (control.name == "Particle")
-                    {
-                        menu.controls.Remove(control);
-                        break;
-                    }
-                }
-            }
-            if (questFlg1)
-            {
-                var AFK_World = descriptor.transform.Find("Advanced/AFK_World/position");
 
-                IllRuruneParam.DestroyObj(AFK_World.Find("water2"));
-                IllRuruneParam.DestroyObj(AFK_World.Find("water3"));
-                IllRuruneParam.DestroyObj(AFK_World.Find("AFKIN Particle"));
-                IllRuruneParam.DestroyObj(AFK_World.Find("swim"));
-                IllRuruneParam.DestroyObj(AFK_World.Find("IdolParticle"));
+            IllRuruneDel4Quest.Edit4Quest(descriptor, this);
 
-                if (Skirt_Root)
-                    DelPBByPathArray(
-                        descriptor,
-                        new string[]
-                        {
-                            "Armature/Hips/Skirt_Root/Skirt_Root_L",
-                            "Armature/Hips/Skirt_Root/Skirt_Root_R",
-                        }
-                    );
+            step2.Stop();
+            return step2.ElapsedMilliseconds;
+        }
 
-                if (Breast)
-                {
-                    DelPBByPathArray(
-                        descriptor,
-                        new string[]
-                        {
-                            "Armature/Hips/Spine/Chest/Breast_L",
-                            "Armature/Hips/Spine/Chest/Breast_R",
-                        }
-                    );
-                }
-                if (backhair)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
-                        )
-                    );
-
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
-                        )
-                    );
-                }
-                if (back_side_root)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_side_root"
-                        )
-                    );
-                }
-                if (Head_002)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/Front_hair1_root/Head.002"
-                        )
-                    );
-                }
-                if (Front_hair2_root)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/Front_hair2_root"
-                        )
-                    );
-                }
-                if (side_1_root)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_1_root"
-                        )
-                    );
-                }
-                if (sidehair)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_2_root/side_ani_L/sidehair_L.003"
-                        )
-                    );
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_2_root/side_ani_R/sidehair_R.003"
-                        )
-                    );
-                }
-                if (sidehair)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_2_root/sidehair_L"
-                        )
-                    );
-
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_2_root/sidehair_R"
-                        )
-                    );
-                }
-                if (side_3_root)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/side_3_root"
-                        )
-                    );
-                }
-                if (Side_root)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/Side_root"
-                        )
-                    );
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find("Armature/Hips/Spine/Chest/Breast_L")
-                    );
-
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find("Armature/Hips/Spine/Chest/Breast_R")
-                    );
-                }
-                if (tail_044)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find("Armature/Hips/tail/tail.044")
-                    );
-                }
-                if (tail_022)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/tail/tail.044/tail.001/tail.002/tail.003/tail.004/tail.005/tail.006/tail.007/tail.008/tail.009/tail.010/tail.011/tail.012/tail.013/tail.014/tail.018/tail.021/tail.022"
-                        )
-                    );
-
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/tail/tail.044/tail.001/tail.002/tail.003/tail.004/tail.005/tail.006/tail.007/tail.008/tail.009/tail.010/tail.011/tail.012/tail.013/tail.014/tail.018/tail.021/tail.024"
-                        )
-                    );
-                }
-                if (chest_collider1)
-                {
-                    {
-                        if (
-                            descriptor.transform.Find(
-                                "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
-                            )
-                        )
-                        {
-                            var physBone = descriptor
-                                .transform.Find(
-                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
-                                )
-                                .GetComponent<VRCPhysBoneBase>();
-                            if (physBone != null && physBone.colliders != null)
-                            {
-                                // chest_collider という名前が付いたコライダーのみ削除
-                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
-                                {
-                                    var collider = physBone.colliders[i];
-                                    if (
-                                        collider != null
-                                        && collider.name.Contains("chest_collider")
-                                    )
-                                    {
-                                        physBone.colliders.RemoveAt(i);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    {
-                        if (
-                            descriptor.transform.Find(
-                                "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
-                            )
-                        )
-                        {
-                            var physBone = descriptor
-                                .transform.Find(
-                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
-                                )
-                                .GetComponent<VRCPhysBoneBase>();
-                            if (physBone != null && physBone.colliders != null)
-                            {
-                                // chest_collider という名前が付いたコライダーのみ削除
-                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
-                                {
-                                    var collider = physBone.colliders[i];
-                                    if (
-                                        collider != null
-                                        && collider.name.Contains("chest_collider")
-                                    )
-                                    {
-                                        physBone.colliders.RemoveAt(i);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (chest_collider2)
-                {
-                    {
-                        if (descriptor.transform.Find("Armature/Hips/tail/tail.044"))
-                        {
-                            var physBone = descriptor
-                                .transform.Find("Armature/Hips/tail/tail.044")
-                                .GetComponent<VRCPhysBoneBase>();
-                            if (physBone != null && physBone.colliders != null)
-                            {
-                                // chest_collider という名前が付いたコライダーのみ削除
-                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
-                                {
-                                    var collider = physBone.colliders[i];
-                                    if (
-                                        collider != null
-                                        && collider.name.Contains("chest_collider")
-                                    )
-                                    {
-                                        physBone.colliders.RemoveAt(i);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (chest_collider1 && chest_collider2)
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
-                        descriptor.transform.Find("Armature/Hips/Spine/Chest/chest_collider")
-                    );
-                if (upperleg_collider1)
-                {
-                    if (
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
-                        )
-                    )
-                    {
-                        {
-                            var physBone = descriptor
-                                .transform.Find(
-                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
-                                )
-                                .GetComponent<VRCPhysBoneBase>();
-                            if (physBone != null && physBone.colliders != null)
-                            {
-                                // chest_collider という名前が付いたコライダーのみ削除
-                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
-                                {
-                                    var collider = physBone.colliders[i];
-                                    if (
-                                        collider != null
-                                        && (
-                                            collider.name.Contains("upperleg_L_collider")
-                                            || collider.name.Contains("upperleg_R_collider")
-                                        )
-                                    )
-                                    {
-                                        physBone.colliders.RemoveAt(i);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    {
-                        if (
-                            descriptor.transform.Find(
-                                "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
-                            )
-                        )
-                        {
-                            var physBone = descriptor
-                                .transform.Find(
-                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
-                                )
-                                .GetComponent<VRCPhysBoneBase>();
-                            if (physBone != null && physBone.colliders != null)
-                            {
-                                // chest_collider という名前が付いたコライダーのみ削除
-                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
-                                {
-                                    var collider = physBone.colliders[i];
-                                    if (
-                                        collider != null
-                                        && (
-                                            collider.name.Contains("upperleg_L_collider")
-                                            || collider.name.Contains("upperleg_R_collider")
-                                        )
-                                    )
-                                    {
-                                        physBone.colliders.RemoveAt(i);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (upperleg_collider2)
-                {
-                    {
-                        if (descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L"))
-                        {
-                            var physBone = descriptor
-                                .transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_L")
-                                .GetComponent<VRCPhysBoneBase>();
-                            if (physBone != null && physBone.colliders != null)
-                            {
-                                // chest_collider という名前が付いたコライダーのみ削除
-                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
-                                {
-                                    var collider = physBone.colliders[i];
-                                    if (
-                                        collider != null
-                                        && (
-                                            collider.name.Contains("upperleg_L_collider")
-                                            || collider.name.Contains("upperleg_R_collider")
-                                        )
-                                    )
-                                    {
-                                        physBone.colliders.RemoveAt(i);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    {
-                        if (descriptor.transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R"))
-                        {
-                            var physBone = descriptor
-                                .transform.Find("Armature/Hips/Skirt_Root/Skirt_Root_R")
-                                .GetComponent<VRCPhysBoneBase>();
-                            if (physBone != null && physBone.colliders != null)
-                            {
-                                // chest_collider という名前が付いたコライダーのみ削除
-                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
-                                {
-                                    var collider = physBone.colliders[i];
-                                    if (
-                                        collider != null
-                                        && (
-                                            collider.name.Contains("upperleg_L_collider")
-                                            || collider.name.Contains("upperleg_R_collider")
-                                        )
-                                    )
-                                    {
-                                        physBone.colliders.RemoveAt(i);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (upperleg_collider3)
-                {
-                    {
-                        if (descriptor.transform.Find("Armature/Hips/tail/tail.044"))
-                        {
-                            var physBone = descriptor
-                                .transform.Find("Armature/Hips/tail/tail.044")
-                                .GetComponent<VRCPhysBoneBase>();
-                            if (physBone != null && physBone.colliders != null)
-                            {
-                                // chest_collider という名前が付いたコライダーのみ削除
-                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
-                                {
-                                    var collider = physBone.colliders[i];
-                                    if (
-                                        collider != null
-                                        && (
-                                            collider.name.Contains("upperleg_L_collider")
-                                            || collider.name.Contains("upperleg_R_collider")
-                                        )
-                                    )
-                                    {
-                                        physBone.colliders.RemoveAt(i);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (upperleg_collider1 && upperleg_collider2 && upperleg_collider3)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
-                        descriptor.transform.Find("Armature/Hips/Upperleg_L/upperleg_L_collider")
-                    );
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
-                        descriptor.transform.Find("Armature/Hips/Upperleg_R/upperleg_R_collider")
-                    );
-                }
-                if (upperArm_collider)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Shoulder_L/Upperarm_L/upperArm_L_collider"
-                        )
-                    );
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Shoulder_R/Upperarm_R/upperArm_R_collider"
-                        )
-                    );
-                }
-                if (plane_collider)
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
-                        descriptor.transform.Find("Armature/plane_collider")
-                    );
-                if (head_collider1)
-                {
-                    {
-                        if (
-                            descriptor.transform.Find(
-                                "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
-                            )
-                        )
-                        {
-                            var physBone = descriptor
-                                .transform.Find(
-                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_L/backhair_L"
-                                )
-                                .GetComponent<VRCPhysBoneBase>();
-                            if (physBone != null && physBone.colliders != null)
-                            {
-                                // chest_collider という名前が付いたコライダーのみ削除
-                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
-                                {
-                                    var collider = physBone.colliders[i];
-                                    if (collider != null && collider.name.Contains("head_collider"))
-                                    {
-                                        physBone.colliders.RemoveAt(i);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    {
-                        if (
-                            descriptor.transform.Find(
-                                "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
-                            )
-                        )
-                        {
-                            var physBone = descriptor
-                                .transform.Find(
-                                    "Armature/Hips/Spine/Chest/Neck/Head/Hair_root/back_hair_root/back_hair_root_R/backhair_R"
-                                )
-                                .GetComponent<VRCPhysBoneBase>();
-                            if (physBone != null && physBone.colliders != null)
-                            {
-                                // chest_collider という名前が付いたコライダーのみ削除
-                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
-                                {
-                                    var collider = physBone.colliders[i];
-                                    if (collider != null && collider.name.Contains("head_collider"))
-                                    {
-                                        physBone.colliders.RemoveAt(i);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (head_collider2)
-                {
-                    {
-                        if (descriptor.transform.Find("Armature/Hips/tail/tail.044"))
-                        {
-                            var physBone = descriptor
-                                .transform.Find("Armature/Hips/tail/tail.044")
-                                .GetComponent<VRCPhysBoneBase>();
-                            if (physBone != null && physBone.colliders != null)
-                            {
-                                // chest_collider という名前が付いたコライダーのみ削除
-                                for (int i = physBone.colliders.Count - 1; i >= 0; i--)
-                                {
-                                    var collider = physBone.colliders[i];
-                                    if (collider != null && collider.name.Contains("head_collider"))
-                                    {
-                                        physBone.colliders.RemoveAt(i);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (head_collider1 && head_collider2)
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/head_collider"
-                        )
-                    );
-                if (Breast_collider)
-                {
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
-                        descriptor.transform.Find("Armature/Hips/Spine/Chest/Breast_R")
-                    );
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
-                        descriptor.transform.Find("Armature/Hips/Spine/Chest/Breast_L")
-                    );
-                }
-                if (plane_tail_collider)
-                    IllRuruneParam.DestroyComponent<VRCPhysBoneColliderBase>(
-                        descriptor.transform.Find("Armature/plane_tail_collider")
-                    );
-            }
-
-            if (AAORemoveFlg)
-            {
-#if AVATAR_OPTIMIZER_FOUND
-                if (
-                    !descriptor
-                        .transform.Find("Body")
-                        .TryGetComponent<RemoveMeshByBlendShape>(out var removeMesh)
-                )
-                {
-                    removeMesh = descriptor
-                        .transform.Find("Body")
-                        .gameObject.AddComponent<RemoveMeshByBlendShape>();
-                    removeMesh.Initialize(1);
-                }
-                removeMesh.ShapeKeys.Add("照れ");
-#endif
-            }
-
+        private long FinalizeAssets(VRCAvatarDescriptor descriptor)
+        {
+            var step4 = Stopwatch.StartNew();
             RemoveUnusedMenuControls(menu, param);
-            // 新規に複製した AnimatorController をアセットとして保存
             EditorUtility.SetDirty(controller);
             MarkAllMenusDirty(menu);
             EditorUtility.SetDirty(param);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            // AvatarDescriptor への適用と変更登録
             descriptor.baseAnimationLayers[4].animatorController = controller;
             descriptor.expressionsMenu = menu;
             descriptor.expressionParameters = param;
             EditorUtility.SetDirty(descriptor);
-
-            Debug.Log("最適化を実行しました！");
+            step4.Stop();
+            return step4.ElapsedMilliseconds;
         }
 
-        /// <summary>
-        /// 使用されていないメニューコントロールを再帰的に削除
-        /// </summary>
+        private long InitializeAssets(VRCAvatarDescriptor descriptor)
+        {
+            var step1 = Stopwatch.StartNew();
+            pathDir = pathDirPrefix + descriptor.gameObject.name + pathDirSuffix;
+            if (AssetDatabase.LoadAssetAtPath<AnimatorController>(pathDir + pathName) != null)
+            {
+                AssetDatabase.DeleteAsset(pathDir + pathName);
+                AssetDatabase.DeleteAsset(pathDir + "Menu");
+                AssetDatabase.DeleteAsset(pathDir + "paryi_paraments.asset");
+            }
+            if (!Directory.Exists(pathDir))
+            {
+                Directory.CreateDirectory(pathDir);
+            }
+
+            if (!controllerDef)
+            {
+                if (!descriptor.baseAnimationLayers[4].animatorController)
+                    descriptor.baseAnimationLayers[4].animatorController =
+                        AssetDatabase.LoadAssetAtPath<AnimatorController>(
+                            AssetDatabase.GUIDToAssetPath("3eece7cfaddb2fe4fb361c09935d2231")
+                        );
+                controllerDef =
+                    descriptor.baseAnimationLayers[4].animatorController as AnimatorController;
+            }
+            AssetDatabase.CopyAsset(AssetDatabase.GetAssetPath(controllerDef), pathDir + pathName);
+
+            controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(pathDir + pathName);
+
+            if (!menuDef)
+            {
+                if (!descriptor.expressionsMenu)
+                    descriptor.expressionsMenu = AssetDatabase.LoadAssetAtPath<VRCExpressionsMenu>(
+                        AssetDatabase.GUIDToAssetPath("78032fce499b8cd4c9590b79ccdf3166")
+                    );
+                menuDef = descriptor.expressionsMenu;
+            }
+
+            var iconPath = pathDir + "/icon";
+            if (!Directory.Exists(iconPath))
+            {
+                Directory.CreateDirectory(iconPath);
+            }
+            menu = DuplicateExpressionMenu(menuDef, pathDir, iconPath, questFlg1, textureResize);
+
+            if (!paramDef)
+            {
+                if (!descriptor.expressionParameters)
+                    descriptor.expressionParameters =
+                        AssetDatabase.LoadAssetAtPath<VRCExpressionParameters>(
+                            AssetDatabase.GUIDToAssetPath("ab33368960825474eb83487d302f6743")
+                        );
+                paramDef = descriptor.expressionParameters;
+                paramDef.name = descriptor.expressionParameters.name;
+            }
+            param = ScriptableObject.CreateInstance<VRCExpressionParameters>();
+            EditorUtility.CopySerialized(paramDef, param);
+            param.name = paramDef.name;
+            EditorUtility.SetDirty(param);
+            AssetDatabase.CreateAsset(param, pathDir + param.name + ".asset");
+            step1.Stop();
+            return step1.ElapsedMilliseconds;
+        }
+
         private static void RemoveUnusedMenuControls(
             VRCExpressionsMenu menu,
             VRCExpressionParameters param
@@ -1213,31 +553,26 @@ namespace jp.illusive_isc.RuruneOptimizer
             if (menu == null)
                 return;
 
-            // このメニューの不要なコントロールを削除
             for (int i = menu.controls.Count - 1; i >= 0; i--)
             {
                 var control = menu.controls[i];
                 bool shouldRemove = true;
 
-                // パラメータ名が空の場合はスキップ
                 if (string.IsNullOrEmpty(control.parameter.name))
                 {
                     shouldRemove = false;
                 }
                 else
                 {
-                    // パラメータが存在するかチェック
                     if (param.parameters.Any(p => p.name == control.parameter.name))
                     {
                         shouldRemove = false;
                     }
                 }
 
-                // サブメニューがある場合は再帰的にチェック
                 if (control.subMenu != null)
                 {
                     RemoveUnusedMenuControls(control.subMenu, param);
-                    // サブメニューに有効なコントロールがある場合は削除しない
                     if (control.subMenu.controls.Count > 0)
                     {
                         shouldRemove = false;
@@ -1248,14 +583,6 @@ namespace jp.illusive_isc.RuruneOptimizer
                 {
                     menu.controls.RemoveAt(i);
                 }
-            }
-        }
-
-        private static void DelPBByPathArray(VRCAvatarDescriptor descriptor, string[] paths)
-        {
-            foreach (var path in paths)
-            {
-                IllRuruneParam.DestroyComponent<VRCPhysBoneBase>(descriptor.transform.Find(path));
             }
         }
 
@@ -1275,9 +602,6 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
         }
 
-        /// <summary>
-        /// Expression Menu の複製（サブメニューも再帰的に複製）
-        /// </summary>
         public static VRCExpressionsMenu DuplicateExpressionMenu(
             VRCExpressionsMenu originalMenu,
             string parentPath,
@@ -1298,9 +622,6 @@ namespace jp.illusive_isc.RuruneOptimizer
             );
         }
 
-        /// <summary>
-        /// Expression Menu の複製（サブメニューも再帰的に複製）
-        /// </summary>
         private static VRCExpressionsMenu DuplicateExpressionMenu(
             VRCExpressionsMenu originalMenu,
             string parentPath,
@@ -1318,7 +639,6 @@ namespace jp.illusive_isc.RuruneOptimizer
                 return null;
             }
 
-            // 最初の呼び出しの場合、processedMenusを初期化
             bool isRootCall = processedMenus == null;
             if (isRootCall)
             {
@@ -1326,7 +646,6 @@ namespace jp.illusive_isc.RuruneOptimizer
                 processedIcons = new Dictionary<string, Texture2D>();
             }
 
-            // 既に処理済みのメニューの場合、キャッシュされたものを返す
             if (processedMenus.ContainsKey(originalMenu))
             {
                 return processedMenus[originalMenu];
@@ -1335,23 +654,19 @@ namespace jp.illusive_isc.RuruneOptimizer
             VRCExpressionsMenu newMenu = Instantiate(originalMenu);
             newMenu.name = originalMenu.name;
 
-            // 処理済みリストに追加（循環参照を防ぐため、早めに追加）
             processedMenus[originalMenu] = newMenu;
 
             if (isRootCall)
             {
-                // ルートメニューの場合は、CreateAssetで作成
                 string menuAssetPath = Path.Combine(parentPath, originalMenu.name + ".asset");
                 AssetDatabase.CreateAsset(newMenu, menuAssetPath);
                 rootMenuAsset = newMenu;
             }
             else if (rootMenuAsset != null)
             {
-                // サブメニューの場合は、rootMenuAssetの子としてAddObjectToAssetで配置
                 AssetDatabase.AddObjectToAsset(newMenu, rootMenuAsset);
             }
 
-            // サブメニューの複製とアイコンのディープコピー
             for (int i = 0; i < newMenu.controls.Count; i++)
             {
                 var control = newMenu.controls[i];
@@ -1361,7 +676,6 @@ namespace jp.illusive_isc.RuruneOptimizer
                     {
                         var originalControl = originalMenu.controls[i];
 
-                        // --- アイコンのディープコピー処理 ---
                         if (originalControl.icon != null)
                         {
                             string iconAssetPath = AssetDatabase.GetAssetPath(originalControl.icon);
@@ -1370,28 +684,23 @@ namespace jp.illusive_isc.RuruneOptimizer
                                 string iconFileName = Path.GetFileName(iconAssetPath);
                                 string destPath = Path.Combine(iconPath, iconFileName);
 
-                                // 既に処理済みのアイコンかチェック
                                 if (processedIcons.ContainsKey(iconAssetPath))
                                 {
-                                    // 既に処理済みの場合、キャッシュされたテクスチャを使用
                                     control.icon = processedIcons[iconAssetPath];
                                 }
                                 else
                                 {
-                                    // 新しいアイコンの場合、コピーして処理
                                     if (!File.Exists(destPath))
                                     {
                                         File.Copy(iconAssetPath, destPath, true);
                                         AssetDatabase.ImportAsset(destPath);
                                     }
 
-                                    // コピーしたアイコンをロードして設定
                                     var copiedIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(
                                         destPath
                                     );
                                     if (copiedIcon != null)
                                     {
-                                        // Max Sizeを変更
                                         var importer =
                                             AssetImporter.GetAtPath(destPath) as TextureImporter;
                                         if (importer != null)
@@ -1400,7 +709,6 @@ namespace jp.illusive_isc.RuruneOptimizer
                                             importer.SaveAndReimport();
                                         }
 
-                                        // キャッシュに保存
                                         processedIcons[iconAssetPath] = copiedIcon;
                                         control.icon = copiedIcon;
                                     }
@@ -1413,7 +721,6 @@ namespace jp.illusive_isc.RuruneOptimizer
                         control.icon = null;
                     }
                 }
-                // サブメニューの複製
                 if (control.subMenu != null)
                 {
                     control.subMenu = DuplicateExpressionMenu(

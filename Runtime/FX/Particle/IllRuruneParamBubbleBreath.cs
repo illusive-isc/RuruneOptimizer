@@ -82,7 +82,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamBubbleBreath DestroyObj()
+        public IllRuruneParamBubbleBreath ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("Advanced/Particle/3"));
             return this;

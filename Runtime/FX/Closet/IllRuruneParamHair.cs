@@ -13,6 +13,18 @@ namespace jp.illusive_isc.RuruneOptimizer
     {
         VRCAvatarDescriptor descriptor;
         AnimatorController animator;
+
+        bool HairFlg1;
+        bool HairFlg11;
+        bool HairFlg12;
+        bool HairFlg2;
+        bool HairFlg22;
+        bool HairFlg3;
+        bool HairFlg4;
+        bool HairFlg5;
+        bool HairFlg51;
+        bool HairFlg6;
+        bool tailFlg;
         private static readonly List<string> MenuParameters = new()
         {
             "Object1",
@@ -28,11 +40,23 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamHair Initialize(
             VRCAvatarDescriptor descriptor,
-            AnimatorController animator
+            AnimatorController animator,
+            IllRuruneOptimizer optimizer
         )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            HairFlg1 = optimizer.HairFlg1;
+            HairFlg11 = optimizer.HairFlg11;
+            HairFlg12 = optimizer.HairFlg12;
+            HairFlg2 = optimizer.HairFlg2;
+            HairFlg22 = optimizer.HairFlg22;
+            HairFlg3 = optimizer.HairFlg3;
+            HairFlg4 = optimizer.HairFlg4;
+            HairFlg5 = optimizer.HairFlg5;
+            HairFlg51 = optimizer.HairFlg51;
+            HairFlg6 = optimizer.HairFlg6;
+            tailFlg = optimizer.TailFlg;
             return this;
         }
 
@@ -108,19 +132,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamHair DestroyObj(
-            bool HairFlg1,
-            bool HairFlg11,
-            bool HairFlg12,
-            bool HairFlg2,
-            bool HairFlg22,
-            bool HairFlg3,
-            bool HairFlg4,
-            bool HairFlg5,
-            bool HairFlg51,
-            bool HairFlg6,
-            bool tailFlg
-        )
+        public IllRuruneParamHair ChangeObj()
         {
             var hair = descriptor.transform.Find("hair");
             if (hair)
@@ -236,21 +248,6 @@ namespace jp.illusive_isc.RuruneOptimizer
                 }
                 else
                     descriptor.transform.Find("Advanced/Particle/4").gameObject.SetActive(true);
-            return this;
-        }
-
-        public IllRuruneParamHair DestroyObj4Quest(bool questFlg1)
-        {
-            if (descriptor.transform.Find("Advanced/Particle/4"))
-                if (questFlg1)
-                {
-                    DestroyObj(
-                        descriptor.transform.Find(
-                            "Armature/Hips/Spine/Chest/Neck/Head/headphone_particle"
-                        )
-                    );
-                    DestroyObj(descriptor.transform.Find("Advanced/Particle/4"));
-                }
             return this;
         }
     }

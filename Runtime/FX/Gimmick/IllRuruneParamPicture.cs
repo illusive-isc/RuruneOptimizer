@@ -87,7 +87,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamPicture DestroyObj()
+        public IllRuruneParamPicture ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("Advanced/LookOBJHead"));
             DestroyObj(descriptor.transform.Find("Advanced/CametaLightOBJ_World"));

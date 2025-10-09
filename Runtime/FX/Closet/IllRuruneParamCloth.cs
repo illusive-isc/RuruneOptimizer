@@ -13,6 +13,18 @@ namespace jp.illusive_isc.RuruneOptimizer
     {
         VRCAvatarDescriptor descriptor;
         AnimatorController animator;
+
+        bool TailFlg;
+        bool clothFlg1;
+        bool clothFlg2;
+        bool clothFlg3;
+        bool clothFlg4;
+        bool clothFlg5;
+        bool clothFlg6;
+        bool clothFlg7;
+        bool clothFlg8;
+        bool heelFlg1;
+        bool heelFlg2;
         private static readonly List<string> MenuParameters = new()
         {
             "accesary",
@@ -27,11 +39,23 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public IllRuruneParamCloth Initialize(
             VRCAvatarDescriptor descriptor,
-            AnimatorController animator
+            AnimatorController animator,
+            IllRuruneOptimizer optimizer
         )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            TailFlg = optimizer.TailFlg;
+            clothFlg1 = optimizer.ClothFlg1;
+            clothFlg2 = optimizer.ClothFlg2;
+            clothFlg3 = optimizer.ClothFlg3;
+            clothFlg4 = optimizer.ClothFlg4;
+            clothFlg5 = optimizer.ClothFlg5;
+            clothFlg6 = optimizer.ClothFlg6;
+            clothFlg7 = optimizer.ClothFlg7;
+            clothFlg8 = optimizer.ClothFlg8;
+            heelFlg1 = optimizer.heelFlg1;
+            heelFlg2 = optimizer.heelFlg2;
             return this;
         }
 
@@ -90,19 +114,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamCloth DestroyObjAll(
-            bool TailFlg,
-            bool clothFlg1,
-            bool clothFlg2,
-            bool clothFlg3,
-            bool clothFlg4,
-            bool clothFlg5,
-            bool clothFlg6,
-            bool clothFlg7,
-            bool clothFlg8,
-            bool heelFlg1,
-            bool heelFlg2
-        )
+        public IllRuruneParamCloth ChangeObj()
         {
             var underwear = descriptor.transform.Find("underwear");
             if (underwear)

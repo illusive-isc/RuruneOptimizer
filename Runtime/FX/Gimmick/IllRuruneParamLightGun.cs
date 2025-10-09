@@ -157,7 +157,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamLightGun DestroyObj()
+        public IllRuruneParamLightGun ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("Advanced/butterfly"));
             return this;

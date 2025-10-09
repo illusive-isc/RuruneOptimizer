@@ -81,7 +81,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamClairvoyance DestroyObj()
+        public IllRuruneParamClairvoyance ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("Advanced/clairvoyance"));
             return this;
