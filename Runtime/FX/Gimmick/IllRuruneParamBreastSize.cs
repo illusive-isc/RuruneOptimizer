@@ -89,7 +89,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamBreastSize DestroyObj()
+        public IllRuruneParamBreastSize ChangeObj()
         {
             var Body_b = descriptor.transform.Find("Body_b");
             if (Body_b)

@@ -11,15 +11,21 @@ namespace jp.illusive_isc.RuruneOptimizer
     {
         VRCAvatarDescriptor descriptor;
         AnimatorController animator;
+
+        bool clothFlg1,
+            clothFlg2;
         private static readonly List<string> MenuParameters = new() { "tail_Ground" };
 
         public IllRuruneParamTail Initialize(
             VRCAvatarDescriptor descriptor,
-            AnimatorController animator
+            AnimatorController animator,
+            IllRuruneOptimizer optimizer
         )
         {
             this.descriptor = descriptor;
             this.animator = animator;
+            clothFlg1 = optimizer.ClothFlg1;
+            clothFlg2 = optimizer.ClothFlg2;
             return this;
         }
 
@@ -48,7 +54,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             return this;
         }
 
-        public IllRuruneParamTail DestroyObj(bool clothFlg1, bool clothFlg2)
+        public IllRuruneParamTail ChangeObj()
         {
             DestroyObj(descriptor.transform.Find("sharktail"));
             DestroyObj(descriptor.transform.Find("Armature/plane_tail_collider"));
