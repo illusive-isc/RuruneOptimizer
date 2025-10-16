@@ -95,6 +95,7 @@ namespace jp.illusive_isc.RuruneOptimizer
         SerializedProperty plane_tail_collider;
         SerializedProperty textureResize;
         SerializedProperty AAORemoveFlg;
+        SerializedProperty Zapu_nFlg;
         bool questArea;
 
         // PB情報とコライダー情報のクラス定義（namespace内、Editorクラス外に移動）
@@ -246,6 +247,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             plane_tail_collider = serializedObject.FindProperty("plane_tail_collider");
             textureResize = serializedObject.FindProperty("textureResize");
             AAORemoveFlg = serializedObject.FindProperty("AAORemoveFlg");
+            Zapu_nFlg = serializedObject.FindProperty("Zapu_nFlg");
         }
 
         public override void OnInspectorGUI()
@@ -366,6 +368,7 @@ namespace jp.illusive_isc.RuruneOptimizer
             GUI.enabled = true;
             GUILayout.EndVertical();
             GUILayout.BeginVertical();
+
             EditorGUILayout.PropertyField(TailFlg, new GUIContent("尻尾削除"));
             EditorGUILayout.PropertyField(TailFlg1, new GUIContent("  └ リボン削除"));
             if (TailFlg.boolValue)
@@ -413,7 +416,9 @@ namespace jp.illusive_isc.RuruneOptimizer
             }
             EditorGUILayout.PropertyField(IKUSIA_emote1, new GUIContent("  └ 手動のAFKは残す"));
             GUI.enabled = true;
-
+            GUILayout.Space(10);
+            if (AssetDatabase.GUIDToAssetPath("ec7fbd8af3a3d86498b65f757efa7283") != "")
+                EditorGUILayout.PropertyField(Zapu_nFlg, new GUIContent("Zapu-n追加"));
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
             questArea = EditorGUILayout.Foldout(questArea, "Quest用調整項目(素体のみ)", true);

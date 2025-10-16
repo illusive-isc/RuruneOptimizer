@@ -177,6 +177,7 @@ namespace jp.illusive_isc.RuruneOptimizer
 
         public bool plane_collider;
         public bool AAORemoveFlg;
+        public bool Zapu_nFlg;
 
         public bool plane_tail_collider;
         public AnimatorController controllerDef;
@@ -381,6 +382,11 @@ namespace jp.illusive_isc.RuruneOptimizer
                 {
                     condition = () => kamitukiFlg || nadeFlg || blinkFlg,
                     processAction = () => ProcessParam<IllRuruneParamFaceContact>(descriptor),
+                },
+                new()
+                {
+                    condition = () => Zapu_nFlg,
+                    processAction = () => ProcessParam<Zapu_n>(descriptor),
                 },
             };
         }
